@@ -7,6 +7,8 @@ import VideoConsultation from "./VideoConsultation";
 import Prescriptions from "./Prescriptions";
 import MedicalRecords from "./MedicalRecords";
 import Feedback from "./Feedback";
+import BackButton from "../Components/BackButton";
+
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -94,5 +96,6 @@ const PatientDashboard = () => {
     </div>
   );
 };
+
 
 export default PatientDashboard;

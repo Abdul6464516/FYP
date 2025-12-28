@@ -1,54 +1,50 @@
-import { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+const Login = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState("patient");
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    // TEMPORARY LOGIC (will connect backend later)
-    if (role === "patient") navigate("/patient/dashboard");
-    if (role === "doctor") navigate("/doctor/dashboard");
-    if (role === "admin") navigate("/admin/dashboard");
-  };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-4">
-          <h3 className="text-center">Telemedicine Login</h3>
+    <div className="h-screen flex items-center justify-center">
+      <div className="border p-6 rounded shadow w-96">
+        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
 
-          <form onSubmit={handleLogin}>
-            <input
-              type="email"
-              className="form-control mb-3"
-              placeholder="Email"
-              required
-            />
-            <input
-              type="password"
-              className="form-control mb-3"
-              placeholder="Password"
-              required
-            />
+        <input
+          type="text"
+          placeholder="Email"
+          className="border p-2 rounded w-full mb-3"
+        />
 
-            <select
-              className="form-control mb-3"
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="patient">Patient</option>
-              <option value="doctor">Doctor</option>
-              <option value="admin">Admin</option>
-            </select>
+        <input
+          type="password"
+          placeholder="Password"
+          className="border p-2 rounded w-full mb-4"
+        />
 
-            <button className="btn btn-primary w-100">Login</button>
-          </form>
-        </div>
+        {/* Dummy Role Buttons */}
+        <button
+          className="bg-blue-500 text-white w-full p-2 rounded mb-2"
+          onClick={() => navigate("/patient")}
+        >
+          Login as Patient
+        </button>
+
+        <button
+          className="bg-green-500 text-white w-full p-2 rounded mb-2"
+          onClick={() => navigate("/doctor")}
+        >
+          Login as Doctor
+        </button>
+
+        <button
+          className="bg-purple-500 text-white w-full p-2 rounded"
+          onClick={() => navigate("/admin")}
+        >
+          Login as Admin
+        </button>
       </div>
     </div>
   );
-}
+};
 
 export default Login;
