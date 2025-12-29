@@ -1,126 +1,145 @@
-import React, { useState, useEffect } from "react";
-import BackButton from "../Components/BackButton";
-// Dummy Data
-const dummyAppointments = [
-  { id: 1, patientName: "John Doe", time: "2025-12-26 10:00", status: "pending" },
-  { id: 2, patientName: "Jane Smith", time: "2025-12-26 11:00", status: "approved" },
-];
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { 
+  UserRound, CalendarCheck, Video, PencilLine, History, Bell, LogOut, Menu, X 
+} from "lucide-react";
 
 const DoctorDashboard = () => {
-  const [doctorProfile, setDoctorProfile] = useState({
-    name: "Dr. Ahmed",
-    specialty: "Cardiology",
-    qualifications: "MBBS, MD",
-    experience: 10,
-    availability: "Mon-Fri 9am-5pm",
-  });
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("Profile");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const [appointments, setAppointments] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    // Fetch appointments from API
-    setAppointments(dummyAppointments);
-
-    // Fetch notifications (new appointment bookings)
-    setNotifications([
-      "New appointment booked by John Doe",
-      "Appointment canceled by Jane Smith",
-    ]);
-  }, []);
-
-  // Handle appointment status
-  const handleAppointmentAction = (id, action) => {
-    setAppointments((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, status: action } : a
-      )
-    );
-    setNotifications((prev) => [...prev, `Appointment ${action} for ID ${id}`]);
+  const handleLogout = () => {
+    navigate("/");
   };
 
-  // Placeholder for video consultation
-  const startConsultation = (patientName) => {
-    alert(`Starting video/audio consultation with ${patientName}`);
-  };
-
-  // Placeholder for prescription generation
-  const generatePrescription = (patientName) => {
-    const prescription = prompt(`Enter prescription for ${patientName}`);
-    if (prescription) {
-      alert(`Prescription for ${patientName}: ${prescription}`);
-    }
-  };
+  // Sidebar Items for Doctor Module
+  const menuItems = [
+    { id: "Profile", icon: <UserRound size={20} />, label: "Doctor Profile" },
+    { id: "Appointments", icon: <CalendarCheck size={20} />, label: "Manage Appointments" },
+    { id: "Consultation", icon: <Video size={20} />, label: "Consultation Room" },
+    { id: "Prescription", icon: <PencilLine size={20} />, label: "Generate Prescription" },
+    { id: "History", icon: <History size={20} />, label: "Patient Records" },
+    { id: "Notifications", icon: <Bell size={20} />, label: "Notifications" },
+  ];
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Doctor Dashboard</h1>
-
-      {/* Doctor Profile */}
-      <section className="mb-6 border p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-2">Profile</h2>
-        <p><strong>Name:</strong> {doctorProfile.name}</p>
-        <p><strong>Specialty:</strong> {doctorProfile.specialty}</p>
-        <p><strong>Qualifications:</strong> {doctorProfile.qualifications}</p>
-        <p><strong>Experience:</strong> {doctorProfile.experience} years</p>
-        <p><strong>Availability:</strong> {doctorProfile.availability}</p>
-      </section>
-
-      {/* Appointments */}
-      <section className="mb-6 border p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-2">Appointments</h2>
-        {appointments.map((appt) => (
-          <div key={appt.id} className="mb-2 p-2 border rounded flex justify-between items-center">
-            <div>
-              <p><strong>Patient:</strong> {appt.patientName}</p>
-              <p><strong>Time:</strong> {appt.time}</p>
-              <p><strong>Status:</strong> {appt.status}</p>
-            </div>
-            <div className="flex gap-2">
-              {appt.status === "pending" && (
-                <>
-                  <button
-                    className="bg-green-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleAppointmentAction(appt.id, "approved")}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleAppointmentAction(appt.id, "canceled")}
-                  >
-                    Cancel
-                  </button>
-                </>
-              )}
-              <button
-                className="bg-blue-500 text-white px-2 py-1 rounded"
-                onClick={() => startConsultation(appt.patientName)}
-              >
-                Consult
-              </button>
-              <button
-                className="bg-yellow-500 text-white px-2 py-1 rounded"
-                onClick={() => generatePrescription(appt.patientName)}
-              >
-                Prescription
-              </button>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* Notifications */}
-      <section className="border p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-2">Notifications</h2>
-        <ul>
-          {notifications.map((note, index) => (
-            <li key={index} className="mb-1">{note}</li>
+    <div style={styles.container}>
+      {/* Sidebar */}
+      <div style={{ ...styles.sidebar, left: isSidebarOpen ? "0" : "-260px" }}>
+        <h2 style={styles.logo}>TeleMed <span style={{fontSize: '12px', display: 'block'}}>Doctor Portal</span></h2>
+        <nav style={styles.nav}>
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              style={{
+                ...styles.navLink,
+                backgroundColor: activeTab === item.id ? "#e7f1ff" : "transparent",
+                color: activeTab === item.id ? "#007bff" : "#333",
+              }}
+            >
+              {item.icon}
+              <span style={{ marginLeft: "10px" }}>{item.label}</span>
+            </button>
           ))}
-        </ul>
-      </section>
+        </nav>
+        <button style={styles.logoutBtn} onClick={handleLogout}>
+          <LogOut size={20} />
+          <span style={{ marginLeft: "10px" }}>Logout</span>
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{ ...styles.mainContent, marginLeft: isSidebarOpen ? "260px" : "0" }}>
+        <header style={styles.header}>
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={styles.menuToggle}>
+            {isSidebarOpen ? <X /> : <Menu />}
+          </button>
+          <h3 style={{margin: 0}}>{activeTab}</h3>
+        </header>
+
+        <main style={styles.contentBody}>
+          <div style={styles.card}>
+            {activeTab === "Profile" && <DoctorProfileView />}
+            {activeTab === "Appointments" && <p>List of pending/approved patient appointments.</p>}
+            {activeTab === "Consultation" && <p>Video/Audio Interface for active sessions.</p>}
+            {activeTab === "Prescription" && <p>Digital Prescription Writing Tool.</p>}
+            {activeTab === "History" && <p>Searchable access to patient medical histories.</p>}
+            {activeTab === "Notifications" && <p>Real-time alerts for booking changes.</p>}
+          </div>
+        </main>
+      </div>
     </div>
   );
+};
+
+// Sub-component for Doctor Profile
+const DoctorProfileView = () => (
+  <div>
+    <h4 style={{marginTop: 0}}>Professional Details</h4>
+    <div style={styles.grid}>
+      <div style={styles.infoBox}><strong>Specialty:</strong> Cardiologist</div>
+      <div style={styles.infoBox}><strong>Qualifications:</strong> MBBS, MD (Internal Medicine)</div>
+      <div style={styles.infoBox}><strong>Experience:</strong> 12+ Years</div>
+      <div style={styles.infoBox}><strong>Schedule:</strong> Mon-Fri (10:00 AM - 4:00 PM)</div>
+    </div>
+  </div>
+);
+
+const styles = {
+  container: { display: "flex", minHeight: "100vh", backgroundColor: "#f0f2f5", fontFamily: "Segoe UI, Tahoma, Geneva, Verdana, sans-serif" },
+  sidebar: {
+    width: "260px",
+    backgroundColor: "#fff",
+    height: "100vh",
+    position: "fixed",
+    boxShadow: "2px 0 10px rgba(0,0,0,0.05)",
+    transition: "0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: 100,
+  },
+  logo: { padding: "20px", textAlign: "center", color: "#007bff", fontSize: "22px", borderBottom: "1px solid #f0f0f0", margin: 0 },
+  nav: { flex: 1, padding: "15px 10px" },
+  navLink: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    padding: "14px 18px",
+    border: "none",
+    borderRadius: "10px",
+    cursor: "pointer",
+    marginBottom: "8px",
+    fontSize: "15px",
+    fontWeight: "500",
+    transition: "all 0.2s",
+  },
+  logoutBtn: {
+    display: "flex",
+    alignItems: "center",
+    padding: "20px 25px",
+    border: "none",
+    backgroundColor: "transparent",
+    color: "#e63946",
+    cursor: "pointer",
+    borderTop: "1px solid #f0f0f0",
+    fontWeight: "600",
+  },
+  mainContent: { flex: 1, transition: "0.3s ease" },
+  header: {
+    height: "70px",
+    backgroundColor: "#fff",
+    display: "flex",
+    alignItems: "center",
+    padding: "0 30px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+  },
+  menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "20px" },
+  contentBody: { padding: "40px" },
+  card: { backgroundColor: "#fff", padding: "30px", borderRadius: "12px", boxShadow: "0 8px 30px rgba(0,0,0,0.05)" },
+  grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" },
+  infoBox: { padding: "15px", border: "1px solid #edf2f7", borderRadius: "8px", backgroundColor: "#fafafa" },
 };
 
 export default DoctorDashboard;

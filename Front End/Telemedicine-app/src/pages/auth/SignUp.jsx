@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import PatientDashboard from "../patient/PatientDashboard";
 
-const Login = () => {
+
+const Signup = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
     role: "patient",
@@ -18,28 +19,26 @@ const Login = () => {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleSignup = (e) => {
     e.preventDefault();
-
-    // Normally backend authentication goes here
-
-    if (formData.role === "patient") {
-      navigate("/patient");
-    } else if (formData.role === "doctor") {
-      navigate("/doctor");
-    } else if (formData.role === "admin") {
-      navigate("/admin");
-    }
-  };
-
-  const handleSignup = () => {
-    navigate("/signup");
+    console.log("Signup Data:", formData);
+    navigate("/");
   };
 
   return (
     <div style={styles.container}>
-      <form style={styles.form} onSubmit={handleLogin}>
-        <h2 style={styles.title}>Login</h2>
+      <form style={styles.form} onSubmit={handleSignup}>
+        <h2 style={styles.title}>Sign Up</h2>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
 
         <input
           type="email"
@@ -72,22 +71,25 @@ const Login = () => {
           <option value="admin">Admin</option>
         </select>
 
-        <button type="submit" style={styles.loginBtn}>
-          Sign In
+        {/* This matches the Green button from your Login file */}
+        <button type="submit" style={styles.signupBtn}>
+          Create Account
         </button>
 
+        {/* This matches the Blue button from your Login file */}
         <button
           type="button"
-          style={styles.signupBtn}
-          onClick={handleSignup}
+          style={styles.loginBtn}
+          onClick={() => navigate("/")}
         >
-          Sign Up
+          Back to Login
         </button>
       </form>
     </div>
   );
 };
 
+// Same styles as your Login component
 const styles = {
   container: {
     minHeight: "100vh",
@@ -106,6 +108,8 @@ const styles = {
   title: {
     textAlign: "center",
     marginBottom: "20px",
+    fontSize: "24px",
+    fontWeight: "bold",
   },
   input: {
     width: "100%",
@@ -113,16 +117,7 @@ const styles = {
     marginBottom: "15px",
     borderRadius: "5px",
     border: "1px solid #ccc",
-  },
-  loginBtn: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    marginBottom: "10px",
-    cursor: "pointer",
+    boxSizing: "border-box", // Important for .jsx to keep inputs inside the box
   },
   signupBtn: {
     width: "100%",
@@ -132,7 +127,18 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
+    marginBottom: "15px", // <--- ADD THIS LINE for the gap
+  },
+  loginBtn: {
+    width: "100%",
+    padding: "10px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    // No margin-bottom needed here unless you add more elements below
   },
 };
 
-export default Login;
+export default Signup;
