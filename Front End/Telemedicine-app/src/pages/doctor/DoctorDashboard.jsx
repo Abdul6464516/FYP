@@ -1,33 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  UserRound, CalendarCheck, Video, PencilLine, History, Bell, LogOut, Menu, X 
+  UserCheck, Users, Calendar, Video, ClipboardList, Settings, LogOut, Menu, X 
 } from "lucide-react";
+
+// Import your DoctorProfile component
+import DoctorProfile from "../../Components/DoctorProfile";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [drName, setDrName] = useState("");
+
+  // Fetch the doctor's name from storage on load
+  useEffect(() => {
+    const savedName = localStorage.getItem("userName");
+    if (savedName) {
+      setDrName(savedName);
+    }
+  }, []);
 
   const handleLogout = () => {
+    localStorage.clear(); // Important: clear session data
     navigate("/");
   };
 
-  // Sidebar Items for Doctor Module
   const menuItems = [
-    { id: "Profile", icon: <UserRound size={20} />, label: "Doctor Profile" },
-    { id: "Appointments", icon: <CalendarCheck size={20} />, label: "Manage Appointments" },
-    { id: "Consultation", icon: <Video size={20} />, label: "Consultation Room" },
-    { id: "Prescription", icon: <PencilLine size={20} />, label: "Generate Prescription" },
-    { id: "History", icon: <History size={20} />, label: "Patient Records" },
-    { id: "Notifications", icon: <Bell size={20} />, label: "Notifications" },
+    { id: "Profile", icon: <UserCheck size={20} />, label: "Doctor Profile" },
+    { id: "Appointments", icon: <Calendar size={20} />, label: "Schedule" },
+    { id: "Patients", icon: <Users size={20} />, label: "My Patients" },
+    { id: "Consultation", icon: <Video size={20} />, label: "Video Consult" },
+    { id: "Reports", icon: <ClipboardList size={20} />, label: "Medical Reports" },
+    { id: "Settings", icon: <Settings size={20} />, label: "Settings" },
   ];
 
   return (
     <div style={styles.container}>
       {/* Sidebar */}
       <div style={{ ...styles.sidebar, left: isSidebarOpen ? "0" : "-260px" }}>
-        <h2 style={styles.logo}>TeleMed <span style={{fontSize: '12px', display: 'block'}}>Doctor Portal</span></h2>
+        <h2 style={styles.logo}>TeleMed <span style={{fontSize: '12px', display: 'block', fontWeight: 'normal'}}>Medical Portal</span></h2>
+        
+        {/* Professional Greeting */}
+        <div style={styles.welcomeBox}>
+          <p style={styles.welcomeText}>Logged in as:</p>
+          <p style={styles.userNameText}>Dr. {drName || "Specialist"}</p>
+        </div>
+
         <nav style={styles.nav}>
           {menuItems.map((item) => (
             <button
@@ -35,8 +54,8 @@ const DoctorDashboard = () => {
               onClick={() => setActiveTab(item.id)}
               style={{
                 ...styles.navLink,
-                backgroundColor: activeTab === item.id ? "#e7f1ff" : "transparent",
-                color: activeTab === item.id ? "#007bff" : "#333",
+                backgroundColor: activeTab === item.id ? "#f0fdf4" : "transparent",
+                color: activeTab === item.id ? "#16a34a" : "#4b5563",
               }}
             >
               {item.icon}
@@ -44,6 +63,7 @@ const DoctorDashboard = () => {
             </button>
           ))}
         </nav>
+        
         <button style={styles.logoutBtn} onClick={handleLogout}>
           <LogOut size={20} />
           <span style={{ marginLeft: "10px" }}>Logout</span>
@@ -56,17 +76,19 @@ const DoctorDashboard = () => {
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={styles.menuToggle}>
             {isSidebarOpen ? <X /> : <Menu />}
           </button>
-          <h3 style={{margin: 0}}>{activeTab}</h3>
+          <h3 style={{ margin: 0, color: '#374151' }}>{activeTab} Management</h3>
         </header>
 
         <main style={styles.contentBody}>
           <div style={styles.card}>
-            {activeTab === "Profile" && <DoctorProfileView />}
-            {activeTab === "Appointments" && <p>List of pending/approved patient appointments.</p>}
-            {activeTab === "Consultation" && <p>Video/Audio Interface for active sessions.</p>}
-            {activeTab === "Prescription" && <p>Digital Prescription Writing Tool.</p>}
-            {activeTab === "History" && <p>Searchable access to patient medical histories.</p>}
-            {activeTab === "Notifications" && <p>Real-time alerts for booking changes.</p>}
+            {/* Conditional Rendering */}
+            {activeTab === "Profile" && <DoctorProfile />}
+            
+            {activeTab === "Appointments" && <p>View and manage your upcoming patient slots.</p>}
+            {activeTab === "Patients" && <p>Access electronic health records (EHR) of your assigned patients.</p>}
+            {activeTab === "Consultation" && <p>Waiting room for secure video consultations.</p>}
+            {activeTab === "Reports" && <p>Review lab results and historical diagnosis reports.</p>}
+            {activeTab === "Settings" && <p>Update your consultation fees and availability hours.</p>}
           </div>
         </main>
       </div>
@@ -74,46 +96,37 @@ const DoctorDashboard = () => {
   );
 };
 
-// Sub-component for Doctor Profile
-const DoctorProfileView = () => (
-  <div>
-    <h4 style={{marginTop: 0}}>Professional Details</h4>
-    <div style={styles.grid}>
-      <div style={styles.infoBox}><strong>Specialty:</strong> Cardiologist</div>
-      <div style={styles.infoBox}><strong>Qualifications:</strong> MBBS, MD (Internal Medicine)</div>
-      <div style={styles.infoBox}><strong>Experience:</strong> 12+ Years</div>
-      <div style={styles.infoBox}><strong>Schedule:</strong> Mon-Fri (10:00 AM - 4:00 PM)</div>
-    </div>
-  </div>
-);
-
 const styles = {
-  container: { display: "flex", minHeight: "100vh", backgroundColor: "#f0f2f5", fontFamily: "Segoe UI, Tahoma, Geneva, Verdana, sans-serif" },
+  container: { display: "flex", minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Inter', sans-serif" },
   sidebar: {
     width: "260px",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     height: "100vh",
     position: "fixed",
     boxShadow: "2px 0 10px rgba(0,0,0,0.05)",
-    transition: "0.3s ease",
+    transition: "0.3s",
     display: "flex",
     flexDirection: "column",
     zIndex: 100,
   },
-  logo: { padding: "20px", textAlign: "center", color: "#007bff", fontSize: "22px", borderBottom: "1px solid #f0f0f0", margin: 0 },
-  nav: { flex: 1, padding: "15px 10px" },
+  logo: { padding: "25px 20px", textAlign: "left", color: "#16a34a", fontSize: "22px", fontWeight: "bold", borderBottom: "1px solid #f3f4f6" },
+  welcomeBox: { padding: "15px 20px", borderBottom: "1px solid #f3f4f6", backgroundColor: "#f9fafb" },
+  welcomeText: { margin: 0, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" },
+  userNameText: { margin: 0, fontSize: "15px", fontWeight: "600", color: "#111827" },
+  nav: { flex: 1, padding: "20px 10px" },
   navLink: {
     display: "flex",
     alignItems: "center",
     width: "100%",
-    padding: "14px 18px",
+    padding: "12px 15px",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "8px",
+    marginBottom: "5px",
     fontSize: "15px",
     fontWeight: "500",
-    transition: "all 0.2s",
+    transition: "0.2s",
+    textAlign: "left",
   },
   logoutBtn: {
     display: "flex",
@@ -121,25 +134,23 @@ const styles = {
     padding: "20px 25px",
     border: "none",
     backgroundColor: "transparent",
-    color: "#e63946",
+    color: "#dc2626",
     cursor: "pointer",
-    borderTop: "1px solid #f0f0f0",
-    fontWeight: "600",
+    borderTop: "1px solid #f3f4f6",
+    fontWeight: "600"
   },
-  mainContent: { flex: 1, transition: "0.3s ease" },
+  mainContent: { flex: 1, transition: "0.3s" },
   header: {
-    height: "70px",
-    backgroundColor: "#fff",
+    height: "64px",
+    backgroundColor: "#ffffff",
     display: "flex",
     alignItems: "center",
-    padding: "0 30px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+    padding: "0 24px",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
   },
-  menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "20px" },
-  contentBody: { padding: "40px" },
-  card: { backgroundColor: "#fff", padding: "30px", borderRadius: "12px", boxShadow: "0 8px 30px rgba(0,0,0,0.05)" },
-  grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" },
-  infoBox: { padding: "15px", border: "1px solid #edf2f7", borderRadius: "8px", backgroundColor: "#fafafa" },
+  menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "16px", color: "#4b5563" },
+  contentBody: { padding: "32px" },
+  card: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" },
 };
 
 export default DoctorDashboard;

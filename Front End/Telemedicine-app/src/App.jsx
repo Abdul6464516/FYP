@@ -4,6 +4,7 @@ import Signup from "./pages/auth/SignUP";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+
 import "./index.css"; // 🔥 REQUIRED
 function App() {
   return (

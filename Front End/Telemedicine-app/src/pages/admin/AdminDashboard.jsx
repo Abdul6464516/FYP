@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ShieldCheck, Users, Activity, Lock, BarChart3, LogOut, Menu, X, CheckCircle, AlertCircle 
+  ShieldCheck, Users, Activity, Lock, BarChart3, LogOut, Menu, X, UserCog 
 } from "lucide-react";
+
+// --- IMPORT THE NEW COMPONENT ---
+import AdminProfile from "../../Components/AdminProfile";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("User Management");
+  const [activeTab, setActiveTab] = useState("Admin Profile"); // Default to Profile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleLogout = () => {
@@ -14,6 +17,7 @@ const AdminDashboard = () => {
   };
 
   const menuItems = [
+    { id: "Admin Profile", icon: <UserCog size={20} />, label: "Admin Profile" },
     { id: "User Management", icon: <Users size={20} />, label: "User Management" },
     { id: "System Monitoring", icon: <Activity size={20} />, label: "System Activity" },
     { id: "Security & Privacy", icon: <Lock size={20} />, label: "Security & Privacy" },
@@ -58,6 +62,9 @@ const AdminDashboard = () => {
 
         <main style={styles.contentBody}>
           <div style={styles.card}>
+            {/* --- RENDER ADMIN PROFILE --- */}
+            {activeTab === "Admin Profile" && <AdminProfile />}
+            
             {activeTab === "User Management" && <UserManagementView />}
             {activeTab === "System Monitoring" && <p>Live feed of appointments, feedback, and active consultations.</p>}
             {activeTab === "Security & Privacy" && <p>Log management and encryption status for patient records.</p>}
@@ -69,7 +76,7 @@ const AdminDashboard = () => {
   );
 };
 
-// Sub-component for Admin User Management
+// Sub-component for Admin User Management (Keeping your existing table)
 const UserManagementView = () => (
   <div>
     <h4 style={{marginTop: 0}}>Pending Doctor Verifications</h4>
@@ -96,52 +103,13 @@ const UserManagementView = () => (
 
 const styles = {
   container: { display: "flex", minHeight: "100vh", backgroundColor: "#f3f4f6", fontFamily: "inherit" },
-  sidebar: {
-    width: "260px",
-    backgroundColor: "#ffffff",
-    height: "100vh",
-    position: "fixed",
-    boxShadow: "4px 0 10px rgba(0,0,0,0.03)",
-    transition: "0.3s ease",
-    display: "flex",
-    flexDirection: "column",
-    zIndex: 100,
-  },
+  sidebar: { width: "260px", backgroundColor: "#ffffff", height: "100vh", position: "fixed", boxShadow: "4px 0 10px rgba(0,0,0,0.03)", transition: "0.3s ease", display: "flex", flexDirection: "column", zIndex: 100 },
   logo: { padding: "25px", textAlign: "center", color: "#4f46e5", fontSize: "22px", borderBottom: "1px solid #f3f4f6", margin: 0 },
   nav: { flex: 1, padding: "20px 10px" },
-  navLink: {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    padding: "12px 15px",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginBottom: "10px",
-    fontSize: "15px",
-    fontWeight: "500",
-    transition: "0.2s",
-  },
-  logoutBtn: {
-    display: "flex",
-    alignItems: "center",
-    padding: "20px 25px",
-    border: "none",
-    backgroundColor: "transparent",
-    color: "#ef4444",
-    cursor: "pointer",
-    borderTop: "1px solid #f3f4f6",
-    fontWeight: "bold",
-  },
+  navLink: { display: "flex", alignItems: "center", width: "100%", padding: "12px 15px", border: "none", borderRadius: "8px", cursor: "pointer", marginBottom: "10px", fontSize: "15px", fontWeight: "500", transition: "0.2s" },
+  logoutBtn: { display: "flex", alignItems: "center", padding: "20px 25px", border: "none", backgroundColor: "transparent", color: "#ef4444", cursor: "pointer", borderTop: "1px solid #f3f4f6", fontWeight: "bold" },
   mainContent: { flex: 1, transition: "0.3s ease" },
-  header: {
-    height: "70px",
-    backgroundColor: "#fff",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 30px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-  },
+  header: { height: "70px", backgroundColor: "#fff", display: "flex", alignItems: "center", padding: "0 30px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" },
   menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "20px" },
   contentBody: { padding: "40px" },
   card: { backgroundColor: "#fff", padding: "30px", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" },

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import PatientDashboard from "../patient/PatientDashboard";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,8 +20,20 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Normally backend authentication goes here
+    // 1. Logic to extract a display name from the email 
+    // (e.g., "raziq@example.com" becomes "Raziq")
+    const extractedName = formData.email.split("@")[0];
+    const displayName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
 
+    // 2. Save the session data to the browser's Local Storage
+    localStorage.setItem("userEmail", formData.email);
+    localStorage.setItem("userRole", formData.role);
+    localStorage.setItem("userName", displayName);
+    localStorage.setItem("isLoggedIn", "true");
+
+    console.log("Login successful for:", displayName);
+
+    // 3. Navigate to the specific dashboard based on the selected role
     if (formData.role === "patient") {
       navigate("/patient");
     } else if (formData.role === "doctor") {
@@ -41,47 +52,60 @@ const Login = () => {
       <form style={styles.form} onSubmit={handleLogin}>
         <h2 style={styles.title}>Login</h2>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Email Address</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="example@mail.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            style={styles.input}
+          />
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            style={styles.input}
+          />
+        </div>
 
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          style={styles.input}
-        >
-          <option value="patient">Patient</option>
-          <option value="doctor">Doctor</option>
-          <option value="admin">Admin</option>
-        </select>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Login As</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            style={styles.input}
+          >
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
         <button type="submit" style={styles.loginBtn}>
           Sign In
         </button>
+
+        <div style={styles.divider}>
+          <span style={styles.dividerText}>OR</span>
+        </div>
 
         <button
           type="button"
           style={styles.signupBtn}
           onClick={handleSignup}
         >
-          Sign Up
+          Create New Account
         </button>
       </form>
     </div>
@@ -95,43 +119,76 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f6f8",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   form: {
-    width: "350px",
-    padding: "30px",
+    width: "380px",
+    padding: "40px",
     backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    borderRadius: "12px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
   },
   title: {
     textAlign: "center",
+    marginBottom: "30px",
+    fontSize: "28px",
+    color: "#333",
+    fontWeight: "bold",
+  },
+  inputGroup: {
     marginBottom: "20px",
+  },
+  label: {
+    display: "block",
+    marginBottom: "8px",
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#555",
   },
   input: {
     width: "100%",
-    padding: "10px",
-    marginBottom: "15px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
+    padding: "12px",
+    borderRadius: "8px",
+    border: "1px solid #ddd",
+    fontSize: "15px",
+    outline: "none",
+    boxSizing: "border-box",
   },
   loginBtn: {
     width: "100%",
-    padding: "10px",
+    padding: "14px",
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "5px",
-    marginBottom: "10px",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
     cursor: "pointer",
+    transition: "background 0.3s",
+  },
+  divider: {
+    textAlign: "center",
+    margin: "20px 0",
+    borderBottom: "1px solid #eee",
+    lineHeight: "0.1em",
+  },
+  dividerText: {
+    backgroundColor: "#fff",
+    padding: "0 10px",
+    color: "#aaa",
+    fontSize: "12px",
   },
   signupBtn: {
     width: "100%",
-    padding: "10px",
+    padding: "14px",
     backgroundColor: "#28a745",
     color: "#fff",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
     cursor: "pointer",
+    transition: "background 0.3s",
   },
 };
 

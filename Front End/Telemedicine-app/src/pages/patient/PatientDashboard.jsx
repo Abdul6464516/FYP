@@ -1,20 +1,33 @@
-import React, { useState } from "react";
-// 1. Import useNavigate from react-router-dom
-import { useNavigate } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   User, Calendar, Video, FileText, ClipboardList, Star, LogOut, Menu, X 
 } from "lucide-react";
 
+// --- COMPONENT IMPORTS ---
+import PatientProfile from '../../Components/PatientProfile'; 
+import VideoCall from "../../Components/VideoCall";
+import AppointmentBooking from "../../Components/AppointmentBooking";
+import PrescriptionAccess from "../../Components/PerscriptionAccess";
+import MedicalRecords from "../../Components/MedicalRecords";
+import FeedbackSystem from "../../Components/FeedbackSystem"; // New Import
+
 const PatientDashboard = () => {
-  // 2. Initialize the navigate function
   const navigate = useNavigate(); 
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userName, setUserName] = useState("");
 
-  // Function to handle logout
+  useEffect(() => {
+    const savedName = localStorage.getItem("userName");
+    if (savedName) {
+      setUserName(savedName);
+    }
+  }, []);
+
   const handleLogout = () => {
-    // If you use localStorage or tokens, clear them here (e.g., localStorage.clear())
-    navigate("/"); // Redirect to the Login page
+    localStorage.clear(); 
+    navigate("/"); 
   };
 
   const menuItems = [
@@ -28,9 +41,13 @@ const PatientDashboard = () => {
 
   return (
     <div style={styles.container}>
-      {/* Sidebar */}
       <div style={{ ...styles.sidebar, left: isSidebarOpen ? "0" : "-260px" }}>
         <h2 style={styles.logo}>TeleMed</h2>
+        <div style={styles.welcomeBox}>
+          <p style={styles.welcomeText}>Welcome back,</p>
+          <p style={styles.userNameText}>{userName || "Patient"}</p>
+        </div>
+
         <nav style={styles.nav}>
           {menuItems.map((item) => (
             <button
@@ -48,30 +65,30 @@ const PatientDashboard = () => {
           ))}
         </nav>
         
-        {/* 3. Add onClick to the Logout button */}
         <button style={styles.logoutBtn} onClick={handleLogout}>
           <LogOut size={20} />
           <span style={{ marginLeft: "10px" }}>Logout</span>
         </button>
       </div>
 
-      {/* Main Content Area */}
       <div style={{ ...styles.mainContent, marginLeft: isSidebarOpen ? "260px" : "0" }}>
         <header style={styles.header}>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={styles.menuToggle}>
             {isSidebarOpen ? <X /> : <Menu />}
           </button>
-          <h3>{activeTab} Management</h3>
+          <h3 style={{ margin: 0 }}>{activeTab} Management</h3>
         </header>
 
         <main style={styles.contentBody}>
           <div style={styles.card}>
-            {activeTab === "Profile" && <ProfileView />}
-            {activeTab === "Appointments" && <p>Doctor Search & Booking Interface</p>}
-            {activeTab === "Consultation" && <p>Live WebRTC Video Session Area</p>}
-            {activeTab === "Prescriptions" && <p>Downloadable Digital Prescriptions</p>}
-            {activeTab === "Records" && <p>History of Consultations & Results</p>}
-            {activeTab === "Feedback" && <p>Ratings and Reviews for Doctors</p>}
+            {activeTab === "Profile" && <PatientProfile />}
+            {activeTab === "Appointments" && <AppointmentBooking />}
+            {activeTab === "Consultation" && <VideoCall />}
+            {activeTab === "Prescriptions" && <PrescriptionAccess />}
+            {activeTab === "Records" && <MedicalRecords />}
+            
+            {/* Feedback System Integration */}
+            {activeTab === "Feedback" && <FeedbackSystem />}
           </div>
         </main>
       </div>
@@ -79,70 +96,21 @@ const PatientDashboard = () => {
   );
 };
 
-// ... keep ProfileView and styles same as your original code
-const ProfileView = () => (
-  <div>
-    <h4>Personal Details</h4>
-    <div style={styles.grid}>
-      <div style={styles.infoBox}><strong>Name:</strong> John Doe</div>
-      <div style={styles.infoBox}><strong>Age:</strong> 28</div>
-      <div style={styles.infoBox}><strong>Gender:</strong> Male</div>
-      <div style={styles.infoBox}><strong>Medical History:</strong> No major issues</div>
-    </div>
-  </div>
-);
-
 const styles = {
   container: { display: "flex", minHeight: "100vh", backgroundColor: "#f8f9fa", fontFamily: "Arial, sans-serif" },
-  sidebar: {
-    width: "260px",
-    backgroundColor: "#fff",
-    height: "100vh",
-    position: "fixed",
-    boxShadow: "2px 0 5px rgba(0,0,0,0.05)",
-    transition: "0.3s",
-    display: "flex",
-    flexDirection: "column",
-    zIndex: 100,
-  },
-  logo: { padding: "20px", textAlign: "center", color: "#007bff", fontSize: "24px", borderBottom: "1px solid #eee" },
+  sidebar: { width: "260px", backgroundColor: "#fff", height: "100vh", position: "fixed", boxShadow: "2px 0 5px rgba(0,0,0,0.05)", transition: "0.3s", display: "flex", flexDirection: "column", zIndex: 100 },
+  logo: { padding: "20px", textAlign: "center", color: "#007bff", fontSize: "24px", borderBottom: "1px solid #eee", marginBottom: '0', fontWeight: 'bold' },
+  welcomeBox: { padding: "15px 20px", borderBottom: "1px solid #eee", backgroundColor: "#fafafa" },
+  welcomeText: { margin: 0, fontSize: "12px", color: "#888", textTransform: 'uppercase' },
+  userNameText: { margin: 0, fontSize: "16px", fontWeight: "bold", color: "#333" },
   nav: { flex: 1, padding: "20px 10px" },
-  navLink: {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    padding: "12px 15px",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginBottom: "5px",
-    fontSize: "16px",
-    transition: "0.2s",
-  },
-  logoutBtn: {
-    display: "flex",
-    alignItems: "center",
-    padding: "20px",
-    border: "none",
-    backgroundColor: "transparent",
-    color: "#dc3545",
-    cursor: "pointer",
-    borderTop: "1px solid #eee",
-  },
+  navLink: { display: "flex", alignItems: "center", width: "100%", padding: "12px 15px", border: "none", borderRadius: "8px", cursor: "pointer", marginBottom: "5px", fontSize: "15px", transition: "0.2s", textAlign: 'left' },
+  logoutBtn: { display: "flex", alignItems: "center", padding: "20px", border: "none", backgroundColor: "transparent", color: "#dc3545", cursor: "pointer", borderTop: "1px solid #eee", fontWeight: "bold" },
   mainContent: { flex: 1, transition: "0.3s" },
-  header: {
-    height: "60px",
-    backgroundColor: "#fff",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 20px",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-  },
+  header: { height: "60px", backgroundColor: "#fff", display: "flex", alignItems: "center", padding: "0 20px", boxShadow: "0 2px 5px rgba(0,0,0,0.05)" },
   menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "15px" },
   contentBody: { padding: "30px" },
-  card: { backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" },
-  grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginTop: "15px" },
-  infoBox: { padding: "10px", border: "1px solid #eee", borderRadius: "5px" },
+  card: { backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)", minHeight: '500px' }
 };
 
 export default PatientDashboard;
