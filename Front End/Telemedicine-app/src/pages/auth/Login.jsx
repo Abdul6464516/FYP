@@ -70,7 +70,7 @@ const Login = () => {
           <input
             type="password"
             name="password"
-            placeholder="••••••••"
+            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
             required

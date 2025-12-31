@@ -1,65 +1,97 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  UserCheck, Users, Calendar, Video, ClipboardList, Settings, LogOut, Menu, X 
+  UserCheck, Users, Calendar, Video, ClipboardList, 
+  Settings, LogOut, Menu, X, FileText, Bell 
 } from "lucide-react";
 
-// Import your DoctorProfile component
+// --- COMPONENT IMPORTS ---
 import DoctorProfile from "../../Components/DoctorProfile";
+import AppointmentManagement from "../../Components/AppointmentManagement";
+import ConsultationInterface from "../../Components/ConsultationInterface";
+import PatientHistory from "../../Components/PatientHistory";
+import PrescriptionGeneration from "../../Components/PrescriptionGeneration";
+import MedicalReports from "../../Components/MedicalReports";
+import NotificationCenter from "../../Components/NotificationCenter";
+import DoctorSettings from "../../Components/DoctorSettings";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Profile");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [drName, setDrName] = useState("");
+  const [unreadNotifications, setUnreadNotifications] = useState(2); // Mock count
 
-  // Fetch the doctor's name from storage on load
   useEffect(() => {
-    const savedName = localStorage.getItem("userName");
-    if (savedName) {
-      setDrName(savedName);
-    }
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) setIsSidebarOpen(false);
+      else setIsSidebarOpen(true);
+    };
+
+    window.addEventListener("resize", handleResize);
+    const savedName = localStorage.getItem("userName") || "Specialist";
+    setDrName(savedName);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear(); // Important: clear session data
+    localStorage.clear();
     navigate("/");
   };
 
   const menuItems = [
     { id: "Profile", icon: <UserCheck size={20} />, label: "Doctor Profile" },
     { id: "Appointments", icon: <Calendar size={20} />, label: "Schedule" },
-    { id: "Patients", icon: <Users size={20} />, label: "My Patients" },
+    { id: "Patients", icon: <Users size={20} />, label: "Patient History" },
     { id: "Consultation", icon: <Video size={20} />, label: "Video Consult" },
+    { id: "Prescription", icon: <FileText size={20} />, label: "Prescription" },
     { id: "Reports", icon: <ClipboardList size={20} />, label: "Medical Reports" },
     { id: "Settings", icon: <Settings size={20} />, label: "Settings" },
   ];
 
   return (
     <div style={styles.container}>
-      {/* Sidebar */}
-      <div style={{ ...styles.sidebar, left: isSidebarOpen ? "0" : "-260px" }}>
-        <h2 style={styles.logo}>TeleMed <span style={{fontSize: '12px', display: 'block', fontWeight: 'normal'}}>Medical Portal</span></h2>
-        
-        {/* Professional Greeting */}
-        <div style={styles.welcomeBox}>
-          <p style={styles.welcomeText}>Logged in as:</p>
-          <p style={styles.userNameText}>Dr. {drName || "Specialist"}</p>
-        </div>
+      {/* Mobile Overlay */}
+      {isMobile && isSidebarOpen && (
+        <div style={styles.overlay} onClick={() => setIsSidebarOpen(false)} />
+      )}
 
+      {/* SIDEBAR */}
+      <div style={{ 
+        ...styles.sidebar, 
+        left: isSidebarOpen ? "0" : "-280px",
+        width: isMobile ? "250px" : "260px" 
+      }}>
+        <div style={styles.sidebarHeader}>
+          <h2 style={styles.logo}>TeleMed</h2>
+          <div style={styles.welcomeContainer}>
+            <span style={styles.welcomeLabel}>WELCOME BACK,</span>
+            <span style={styles.drNameSidebar}>Dr. {drName.split(/[0-9]/)[0]}</span> 
+          </div>
+        </div>
+        
         <nav style={styles.nav}>
           {menuItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                if (isMobile) setIsSidebarOpen(false);
+              }}
               style={{
                 ...styles.navLink,
                 backgroundColor: activeTab === item.id ? "#f0fdf4" : "transparent",
                 color: activeTab === item.id ? "#16a34a" : "#4b5563",
               }}
             >
-              {item.icon}
-              <span style={{ marginLeft: "10px" }}>{item.label}</span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {item.icon}
+                <span style={{ marginLeft: "12px" }}>{item.label}</span>
+              </div>
             </button>
           ))}
         </nav>
@@ -70,25 +102,49 @@ const DoctorDashboard = () => {
         </button>
       </div>
 
-      {/* Main Content Area */}
-      <div style={{ ...styles.mainContent, marginLeft: isSidebarOpen ? "260px" : "0" }}>
+      {/* MAIN CONTENT AREA */}
+      <div style={{ 
+        ...styles.mainContent, 
+        marginLeft: isMobile ? "0" : (isSidebarOpen ? "260px" : "0") 
+      }}>
         <header style={styles.header}>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={styles.menuToggle}>
-            {isSidebarOpen ? <X /> : <Menu />}
-          </button>
-          <h3 style={{ margin: 0, color: '#374151' }}>{activeTab} Management</h3>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={styles.menuToggle}>
+              {isSidebarOpen ? <X /> : <Menu />}
+            </button>
+            <h3 style={styles.headerTitle}>{activeTab} Management</h3>
+          </div>
+
+          <div style={styles.headerActions}>
+            {/* Notification Bell with Badge */}
+            <button 
+              style={styles.notifIconButton} 
+              onClick={() => setActiveTab("Notifications")}
+              title="Notifications"
+            >
+              <Bell size={22} color="#4b5563" />
+              {unreadNotifications > 0 && (
+                <span style={styles.badge}>{unreadNotifications}</span>
+              )}
+            </button>
+
+            <div style={styles.avatar}>
+              {drName.charAt(0).toUpperCase()}
+            </div>
+          </div>
         </header>
 
-        <main style={styles.contentBody}>
+        <main style={{ ...styles.contentBody, padding: isMobile ? "15px" : "30px" }}>
           <div style={styles.card}>
-            {/* Conditional Rendering */}
+            {/* DYNAMIC TAB RENDERING */}
             {activeTab === "Profile" && <DoctorProfile />}
-            
-            {activeTab === "Appointments" && <p>View and manage your upcoming patient slots.</p>}
-            {activeTab === "Patients" && <p>Access electronic health records (EHR) of your assigned patients.</p>}
-            {activeTab === "Consultation" && <p>Waiting room for secure video consultations.</p>}
-            {activeTab === "Reports" && <p>Review lab results and historical diagnosis reports.</p>}
-            {activeTab === "Settings" && <p>Update your consultation fees and availability hours.</p>}
+            {activeTab === "Appointments" && <AppointmentManagement />}
+            {activeTab === "Patients" && <PatientHistory />}
+            {activeTab === "Consultation" && <ConsultationInterface />}
+            {activeTab === "Prescription" && <PrescriptionGeneration />}
+            {activeTab === "Reports" && <MedicalReports />}
+            {activeTab === "Settings" && <DoctorSettings />}
+            {activeTab === "Notifications" && <NotificationCenter />}
           </div>
         </main>
       </div>
@@ -98,59 +154,26 @@ const DoctorDashboard = () => {
 
 const styles = {
   container: { display: "flex", minHeight: "100vh", backgroundColor: "#f9fafb", fontFamily: "'Inter', sans-serif" },
-  sidebar: {
-    width: "260px",
-    backgroundColor: "#ffffff",
-    height: "100vh",
-    position: "fixed",
-    boxShadow: "2px 0 10px rgba(0,0,0,0.05)",
-    transition: "0.3s",
-    display: "flex",
-    flexDirection: "column",
-    zIndex: 100,
-  },
-  logo: { padding: "25px 20px", textAlign: "left", color: "#16a34a", fontSize: "22px", fontWeight: "bold", borderBottom: "1px solid #f3f4f6" },
-  welcomeBox: { padding: "15px 20px", borderBottom: "1px solid #f3f4f6", backgroundColor: "#f9fafb" },
-  welcomeText: { margin: 0, fontSize: "11px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" },
-  userNameText: { margin: 0, fontSize: "15px", fontWeight: "600", color: "#111827" },
-  nav: { flex: 1, padding: "20px 10px" },
-  navLink: {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    padding: "12px 15px",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginBottom: "5px",
-    fontSize: "15px",
-    fontWeight: "500",
-    transition: "0.2s",
-    textAlign: "left",
-  },
-  logoutBtn: {
-    display: "flex",
-    alignItems: "center",
-    padding: "20px 25px",
-    border: "none",
-    backgroundColor: "transparent",
-    color: "#dc2626",
-    cursor: "pointer",
-    borderTop: "1px solid #f3f4f6",
-    fontWeight: "600"
-  },
-  mainContent: { flex: 1, transition: "0.3s" },
-  header: {
-    height: "64px",
-    backgroundColor: "#ffffff",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 24px",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-  },
-  menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "16px", color: "#4b5563" },
-  contentBody: { padding: "32px" },
-  card: { backgroundColor: "#ffffff", padding: "28px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" },
+  overlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.4)", zIndex: 99 },
+  sidebar: { backgroundColor: "#ffffff", height: "100vh", position: "fixed", boxShadow: "2px 0 10px rgba(0,0,0,0.05)", transition: "0.3s cubic-bezier(0.4, 0, 0.2, 1)", display: "flex", flexDirection: "column", zIndex: 100 },
+  sidebarHeader: { padding: "25px 20px", borderBottom: "1px solid #f3f4f6" },
+  logo: { color: "#16a34a", margin: 0, fontSize: "22px", fontWeight: "bold" },
+  welcomeContainer: { marginTop: "15px", display: "flex", flexDirection: "column" },
+  welcomeLabel: { fontSize: "10px", color: "#9ca3af", fontWeight: "800", letterSpacing: "0.5px" },
+  drNameSidebar: { fontSize: "16px", fontWeight: "700", color: "#111827", marginTop: "2px" },
+  nav: { flex: 1, padding: "15px 10px", overflowY: "auto" },
+  navLink: { display: "flex", alignItems: "center", width: "100%", padding: "12px 15px", border: "none", borderRadius: "8px", cursor: "pointer", marginBottom: "4px", fontSize: "14px", fontWeight: "500", transition: "0.2s", textAlign: "left" },
+  logoutBtn: { display: "flex", alignItems: "center", padding: "20px 25px", border: "none", backgroundColor: "transparent", color: "#dc2626", cursor: "pointer", borderTop: "1px solid #f3f4f6", fontWeight: "600" },
+  mainContent: { flex: 1, transition: "0.3s ease-in-out", minWidth: 0 },
+  header: { height: "70px", backgroundColor: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", position: 'sticky', top: 0, zIndex: 90, boxShadow: "0 1px 2px rgba(0,0,0,0.05)" },
+  headerTitle: { margin: 0, color: '#374151', fontSize: '1.1rem', fontWeight: "600" },
+  headerActions: { display: "flex", alignItems: "center", gap: "20px" },
+  notifIconButton: { background: "none", border: "none", cursor: "pointer", position: "relative", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" },
+  badge: { position: "absolute", top: "0px", right: "0px", backgroundColor: "#dc2626", color: "white", fontSize: "10px", fontWeight: "bold", padding: "2px 5px", borderRadius: "10px", border: "2px solid #fff", minWidth: "18px", textAlign: "center" },
+  avatar: { width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#16a34a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" },
+  menuToggle: { border: "none", backgroundColor: "transparent", cursor: "pointer", marginRight: "15px", color: "#4b5563" },
+  contentBody: { width: "100%" },
+  card: { backgroundColor: "#fff", padding: "28px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", minHeight: '80vh' }
 };
 
 export default DoctorDashboard;
