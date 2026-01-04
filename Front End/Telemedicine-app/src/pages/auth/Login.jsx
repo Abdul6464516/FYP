@@ -19,14 +19,21 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+
+    // 1. Logic to extract a display name from the email 
+    // (e.g., "raziq@example.com" becomes "Raziq")
     const extractedName = formData.email.split("@")[0];
     const displayName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
 
+    // 2. Save the session data to the browser's Local Storage
     localStorage.setItem("userEmail", formData.email);
     localStorage.setItem("userRole", formData.role);
     localStorage.setItem("userName", displayName);
     localStorage.setItem("isLoggedIn", "true");
 
+    console.log("Login successful for:", displayName);
+
+    // 3. Navigate to the specific dashboard based on the selected role
     if (formData.role === "patient") {
       navigate("/patient");
     } else if (formData.role === "doctor") {
@@ -38,12 +45,6 @@ const Login = () => {
 
   const handleSignup = () => {
     navigate("/signup");
-  };
-
-  // Function to handle forgot password click
-  const handleForgotPassword = () => {
-    navigate("/forgot-password"); 
-    // alert("Redirecting to password reset page...");
   };
 
   return (
@@ -65,16 +66,7 @@ const Login = () => {
         </div>
 
         <div style={styles.inputGroup}>
-          <div style={styles.labelWrapper}>
-            <label style={styles.label}>Password</label>
-            {/* Added Forgot Password Link */}
-            <span 
-              onClick={handleForgotPassword} 
-              style={styles.forgotLink}
-            >
-              Forgot password?
-            </span>
-          </div>
+          <label style={styles.label}>Password</label>
           <input
             type="password"
             name="password"
@@ -146,24 +138,12 @@ const styles = {
   inputGroup: {
     marginBottom: "20px",
   },
-  // Added wrapper to align label and link
-  labelWrapper: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "8px",
-  },
   label: {
+    display: "block",
+    marginBottom: "8px",
     fontSize: "14px",
     fontWeight: "600",
     color: "#555",
-  },
-  // Style for the new link
-  forgotLink: {
-    fontSize: "12px",
-    color: "#007bff",
-    cursor: "pointer",
-    fontWeight: "500",
   },
   input: {
     width: "100%",
