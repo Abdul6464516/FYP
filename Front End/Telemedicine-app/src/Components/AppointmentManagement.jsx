@@ -4,7 +4,7 @@ import { Check, X, Clock, Calendar, User, AlertCircle } from "lucide-react";
 const AppointmentManagement = () => {
   // Mock data for display
   const [appointments, setAppointments] = useState([
-    { id: 1, patient: "John Doe", date: "2023-10-25", time: "10:30 AM", status: "Pending", type: "Video Call" },
+    { id: 1, patient: "John Doe", date: "2023-10-25", time: "10:30 AM", status: "Cancelled", type: "Video Call" },
     { id: 2, patient: "Jane Smith", date: "2023-10-25", time: "11:45 AM", status: "Approved", type: "In-Person" },
     { id: 3, patient: "Robert Brown", date: "2023-10-26", time: "09:00 AM", status: "Pending", type: "Video Call" },
   ]);
@@ -19,7 +19,9 @@ const AppointmentManagement = () => {
     <div style={styles.container}>
       <div style={styles.header}>
         <h4 style={styles.title}>Appointment Requests</h4>
-        <span style={styles.countBadge}>{appointments.filter(a => a.status === 'Pending').length} New</span>
+        <span style={styles.countBadge}>
+          {appointments.filter(a => a.status === 'Pending').length} New
+        </span>
       </div>
 
       <div style={styles.list}>
@@ -64,8 +66,10 @@ const AppointmentManagement = () => {
                   <button 
                     onClick={() => updateStatus(app.id, "Cancelled")}
                     style={styles.cancelBtn}
+                    title="Reject Appointment"
                   >
-                    <X size={20} />
+                    {/* Fixed: Explicit color and strokeWidth for visibility */}
+                    <X size={20} color="#dc2626" strokeWidth={2.5} />
                   </button>
                 </>
               )}
@@ -78,7 +82,7 @@ const AppointmentManagement = () => {
                 </button>
               )}
               {app.status === "Cancelled" && (
-                <span style={{fontSize: '12px', color: '#dc2626', fontWeight: 'bold'}}>Rejected</span>
+                <span style={styles.rejectedText}>Rejected</span>
               )}
             </div>
           </div>
@@ -122,7 +126,7 @@ const styles = {
   dateTimeRow: { display: "flex", gap: "20px", color: "#6b7280", fontSize: "13px" },
   infoItem: { display: "flex", alignItems: "center", gap: "6px" },
   icon: { color: "#9ca3af" },
-  actionButtons: { display: "flex", alignItems: "center", gap: "10px" },
+  actionButtons: { display: "flex", alignItems: "center", gap: "12px" },
   approveBtn: { 
     display: "flex", 
     alignItems: "center", 
@@ -136,20 +140,20 @@ const styles = {
     cursor: "pointer", 
     fontWeight: "600",
     fontSize: "14px",
-    transition: "0.2s"
+    transition: "background 0.2s"
   },
   cancelBtn: { 
     display: "flex", 
     alignItems: "center", 
     justifyContent: "center", 
     backgroundColor: "#fff", 
-    color: "#dc2626", 
-    border: "1px solid #dc2626", 
+    border: "1.5px solid #dc2626", 
     width: "42px", 
     height: "42px", 
     borderRadius: "8px", 
     cursor: "pointer",
-    transition: "0.2s"
+    padding: "0",
+    transition: "all 0.2s ease"
   },
   rescheduleBtn: { 
     backgroundColor: "#f3f4f6", 
@@ -162,6 +166,13 @@ const styles = {
     fontSize: "13px",
     fontWeight: "500" 
   },
+  rejectedText: {
+    fontSize: '12px', 
+    color: '#dc2626', 
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
+  }
 };
 
 export default AppointmentManagement;
