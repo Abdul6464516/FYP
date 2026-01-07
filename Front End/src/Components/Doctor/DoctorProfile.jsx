@@ -110,7 +110,7 @@ const DoctorProfile = () => {
 const docStyles = {
   card: { padding: '10px' },
   header: { marginBottom: '25px', borderBottom: '1px solid #eee', paddingBottom: '10px' },
-  title: { margin: 0, color: '#007bff', fontSize: '20px' },
+  title: { margin: 0, color: '#28a745', fontSize: '20px' },
   subtitle: { margin: '5px 0 0', color: '#666', fontSize: '13px' },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
   field: { display: 'flex', flexDirection: 'column' },
@@ -119,7 +119,7 @@ const docStyles = {
   displayBox: { padding: '10px', backgroundColor: '#fcfcfc', borderRadius: '5px', border: '1px solid #f0f0f0', color: '#333' },
   buttonContainer: { marginTop: '20px', display: 'flex', justifyContent: 'flex-end' },
   submitBtn: { padding: '10px 20px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' },
-  editBtn: { padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }
+  editBtn: { padding: '10px 20px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }
 };
 
 export default DoctorProfile;

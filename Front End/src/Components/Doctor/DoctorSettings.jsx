@@ -47,10 +47,11 @@ const DoctorSettings = () => {
         <div style={styles.toggleRow}>
           <span>Receive email alerts for new bookings</span>
           <input 
-            type="checkbox" 
-            checked={settings.emailNotifications} 
-            onChange={(e) => setSettings({...settings, emailNotifications: e.target.checked})} 
-          />
+  type="checkbox" 
+  checked={settings.emailNotifications} 
+  onChange={(e) => setSettings({...settings, emailNotifications: e.target.checked})} 
+  style={{ accentColor: "#16a34a", width: "13px", height: "13px", cursor: "pointer" }} 
+/>
         </div>
       </div>
 

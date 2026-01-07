@@ -129,7 +129,7 @@ const formStyles = {
   displayBox: { padding: '10px', backgroundColor: '#f9f9f9', borderRadius: '6px', border: '1px solid #eee', color: '#333', minHeight: '20px' },
   buttonContainer: { marginTop: '30px', display: 'flex', justifyContent: 'flex-end' },
   submitBtn: { padding: '12px 25px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' },
-  editBtn: { padding: '12px 25px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }
+  editBtn: { padding: '12px 25px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }
 };
 
 export default PatientProfile;

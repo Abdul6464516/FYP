@@ -48,9 +48,9 @@ const FeedbackSystem = () => {
             value={selectedDoctor} 
             onChange={(e) => setSelectedDoctor(e.target.value)}
           >
-            <option value="">-- Choose a Doctor --</option>
+            <option value="" >-- Choose a Doctor --</option>
             {recentConsultations.map(doc => (
-              <option key={doc.id} value={doc.name}>{doc.name} ({doc.specialty})</option>
+              <option  key={doc.id} value={doc.name}>{doc.name} ({doc.specialty})</option>
             ))}
           </select>
         </div>
@@ -108,9 +108,9 @@ const styles = {
   starRow: { display: 'flex', gap: '8px' },
   starBtn: { border: 'none', background: 'none', cursor: 'pointer', padding: 0 },
   textarea: { padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', minHeight: '120px', outline: 'none', fontFamily: 'inherit' },
-  submitBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' },
+  submitBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' },
   successContainer: { textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' },
-  resetBtn: { marginTop: '10px', padding: '10px 20px', border: '1px solid #007bff', background: 'none', color: '#007bff', borderRadius: '8px', cursor: 'pointer' }
+  resetBtn: { marginTop: '10px', padding: '10px 20px', border: '1px solid #28a745', background: 'none', color: '#28a745', borderRadius: '8px', cursor: 'pointer' }
 };
 
 export default FeedbackSystem;

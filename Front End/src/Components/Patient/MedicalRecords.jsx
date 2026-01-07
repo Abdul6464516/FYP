@@ -77,7 +77,7 @@ const MedicalRecords = () => {
               <tr key={rec.id} style={styles.tr}>
                 <td style={styles.td}>
                   <div style={styles.typeCol}>
-                    <ClipboardList size={18} color="#007bff" />
+                    <ClipboardList size={18} color="#28a745" />
                     <div>
                       <div style={styles.primaryText}>{rec.type}</div>
                       <div style={styles.secondaryText}>{rec.summary}</div>

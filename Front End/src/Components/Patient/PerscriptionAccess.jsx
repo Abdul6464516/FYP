@@ -60,7 +60,7 @@ const PrescriptionAccess = () => {
             <div key={rx.id} style={styles.rxCard}>
               <div style={styles.rxMainInfo}>
                 <div style={styles.iconCircle}>
-                  <FileText color="#007bff" />
+                  <FileText color="#28a745" />
                 </div>
                 <div style={styles.textContainer}>
                   <h4 style={styles.diagnosisText}>{rx.diagnosis}</h4>
@@ -118,7 +118,7 @@ const styles = {
   medTag: { backgroundColor: '#fff', border: '1px solid #cbd5e0', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', color: '#2d3748' },
   actionRow: { display: 'flex', gap: '12px', marginTop: '15px', borderTop: '1px solid #f1f5f9', paddingTop: '15px' },
   viewBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: '1px solid #cbd5e0', borderRadius: '8px', backgroundColor: '#fff', cursor: 'pointer', fontSize: '14px', color: '#4a5568' },
-  downloadBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: 'none', borderRadius: '8px', backgroundColor: '#007bff', color: '#fff', cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
+  downloadBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: 'none', borderRadius: '8px', backgroundColor: '#28a745', color: '#fff', cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
   emptyState: { textAlign: 'center', padding: '40px', color: '#a0aec0', fontSize: '15px' }
 };
 

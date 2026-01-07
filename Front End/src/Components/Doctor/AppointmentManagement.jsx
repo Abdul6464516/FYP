@@ -139,18 +139,19 @@ const styles = {
     transition: "0.2s"
   },
   cancelBtn: { 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center", 
-    backgroundColor: "#fff", 
-    color: "#dc2626", 
-    border: "1px solid #dc2626", 
-    width: "42px", 
-    height: "42px", 
-    borderRadius: "8px", 
-    cursor: "pointer",
-    transition: "0.2s"
-  },
+  display: "flex", 
+  alignItems: "center", 
+  justifyContent: "center", 
+  backgroundColor: "#fef2f2", // Light red background makes the red icon pop
+  color: "#dc2626", 
+  border: "1px solid #fecaca", // Softer border
+  width: "42px", 
+  height: "42px", 
+  borderRadius: "8px", 
+  cursor: "pointer",
+  transition: "0.2s",
+  padding: 0, // Ensure no default padding is pushing the icon out
+},
   rescheduleBtn: { 
     backgroundColor: "#f3f4f6", 
     color: "#4b5563", 
