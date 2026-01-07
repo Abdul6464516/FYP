@@ -12,6 +12,7 @@ import {
   X,
   Search,
 } from "lucide-react";
+import { clearSession } from "../../services/auth";
 
 // --- COMPONENT IMPORTS ---
 import PatientProfile from "../../Components/Patient/PatientProfile";
@@ -38,8 +39,9 @@ const PatientDashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    // clear only auth/session keys and redirect
+    clearSession();
+    navigate('/');
   };
 
   const menuItems = [
