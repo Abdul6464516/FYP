@@ -13,6 +13,7 @@ import {
   FileText,
   Bell,
 } from "lucide-react";
+import { clearSession } from "../../services/auth";
 
 // --- COMPONENT IMPORTS ---
 import DoctorProfile from "../../Components/Doctor/DoctorProfile";
@@ -48,8 +49,8 @@ const DoctorDashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    clearSession();
+    navigate('/');
   };
 
   const menuItems = [
