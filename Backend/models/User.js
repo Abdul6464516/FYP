@@ -19,6 +19,7 @@ const userSchema = new Schema({
   qualifications: { type: String },
   yearsOfExperience: { type: Number },
   availability: { type: String },
+  chargesPerSession: { type: Number },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,26 +1,63 @@
-import React, { useState } from 'react';
-import { Star, Send, User, MessageSquare, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, Send, CheckCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { submitFeedback } from '../../services/patientAction';
+import { fetchDoctors } from '../../services/doctorAction';
 
 const FeedbackSystem = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  const recentConsultations = [
-    { id: 1, name: "Dr. Sarah Smith", specialty: "Cardiology", date: "Dec 28, 2025" },
-    { id: 2, name: "Dr. James Wilson", specialty: "General Physician", date: "Dec 15, 2025" }
-  ];
+  // Fetch all doctors on mount
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const data = await fetchDoctors();
+        setDoctors(data.doctors);
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDoctors();
+  }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0 || !selectedDoctor) {
-      alert("Please select a doctor and provide a rating.");
+      toast.error('Please select a doctor and provide a rating.');
       return;
     }
-    // Simulation of API call
-    setSubmitted(true);
+
+    setSubmitting(true);
+    try {
+      await submitFeedback({
+        rating,
+        message: comment,
+        reviewOn: selectedDoctor,
+      });
+      setSubmitted(true);
+      toast.success('Feedback submitted successfully!');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReset = () => {
+    setSubmitted(false);
+    setRating(0);
+    setHover(0);
+    setComment('');
+    setSelectedDoctor('');
   };
 
   if (submitted) {
@@ -29,7 +66,7 @@ const FeedbackSystem = () => {
         <CheckCircle size={60} color="#28a745" />
         <h3>Thank you for your feedback!</h3>
         <p>Your review helps us improve our healthcare services.</p>
-        <button onClick={() => setSubmitted(false)} style={styles.resetBtn}>Submit Another Review</button>
+        <button onClick={handleReset} style={styles.resetBtn}>Submit Another Review</button>
       </div>
     );
   }
@@ -37,21 +74,27 @@ const FeedbackSystem = () => {
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>Rate Your Consultation</h3>
-      <p style={styles.subtitle}>Select a recent doctor and let us know about your experience.</p>
+      <p style={styles.subtitle}>Select a doctor and let us know about your experience.</p>
 
       <form onSubmit={handleSubmit} style={styles.form}>
         {/* Doctor Selection */}
         <div style={styles.inputGroup}>
           <label style={styles.label}>Select Doctor</label>
-          <select 
-            style={styles.select} 
-            value={selectedDoctor} 
+          <select
+            style={styles.select}
+            value={selectedDoctor}
             onChange={(e) => setSelectedDoctor(e.target.value)}
           >
-            <option value="" >-- Choose a Doctor --</option>
-            {recentConsultations.map(doc => (
-              <option  key={doc.id} value={doc.name}>{doc.name} ({doc.specialty})</option>
-            ))}
+            <option value="">-- Choose a Doctor --</option>
+            {loading ? (
+              <option disabled>Loading doctors...</option>
+            ) : (
+              doctors.map((doc) => (
+                <option key={doc._id} value={doc._id}>
+                  {doc.fullName} ({doc.specialty || 'General'})
+                </option>
+              ))
+            )}
           </select>
         </div>
 
@@ -68,13 +111,16 @@ const FeedbackSystem = () => {
                 onMouseEnter={() => setHover(star)}
                 onMouseLeave={() => setHover(0)}
               >
-                <Star 
-                  size={32} 
-                  fill={(hover || rating) >= star ? "#ffc107" : "none"} 
-                  color={(hover || rating) >= star ? "#ffc107" : "#ccc"} 
+                <Star
+                  size={32}
+                  fill={(hover || rating) >= star ? '#ffc107' : 'none'}
+                  color={(hover || rating) >= star ? '#ffc107' : '#ccc'}
                 />
               </button>
             ))}
+            {rating > 0 && (
+              <span style={styles.ratingText}>{rating} out of 5</span>
+            )}
           </div>
         </div>
 
@@ -89,8 +135,8 @@ const FeedbackSystem = () => {
           />
         </div>
 
-        <button type="submit" style={styles.submitBtn}>
-          <Send size={18} /> Submit Feedback
+        <button type="submit" style={styles.submitBtn} disabled={submitting}>
+          <Send size={18} /> {submitting ? 'Submitting...' : 'Submit Feedback'}
         </button>
       </form>
     </div>
@@ -105,8 +151,9 @@ const styles = {
   inputGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
   label: { fontSize: '14px', fontWeight: 'bold', color: '#4a5568' },
   select: { padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#fff', outline: 'none' },
-  starRow: { display: 'flex', gap: '8px' },
+  starRow: { display: 'flex', gap: '8px', alignItems: 'center' },
   starBtn: { border: 'none', background: 'none', cursor: 'pointer', padding: 0 },
+  ratingText: { marginLeft: '10px', fontSize: '14px', color: '#4a5568', fontWeight: '600' },
   textarea: { padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', minHeight: '120px', outline: 'none', fontFamily: 'inherit' },
   submitBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' },
   successContainer: { textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' },

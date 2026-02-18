@@ -12,7 +12,7 @@ async function register(req, res) {
       // Patient fields
       age, gender, phone, medicalHistory,
       // Doctor fields
-      specialty, qualifications, yearsOfExperience, availability
+      specialty, qualifications, yearsOfExperience, availability, chargesPerSession
     } = req.body;
     if (!fullName || !email || !username || !password) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -32,16 +32,22 @@ async function register(req, res) {
     }
 
     if (role === 'doctor') {
+      userData.gender = gender;
       userData.specialty = specialty;
       userData.qualifications = qualifications;
       userData.yearsOfExperience = yearsOfExperience;
       userData.availability = availability;
+      userData.chargesPerSession = chargesPerSession;
     }
 
     const user = new User(userData);
     await user.save();
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: { id: user._id, fullName: user.fullName, email: user.email, username: user.username, role: user.role } });
+
+    // Return full user details (excluding password)
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    res.status(201).json({ token, user: userResponse });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
@@ -57,7 +63,11 @@ async function login(req, res) {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, fullName: user.fullName, email: user.email, username: user.username, role: user.role } });
+
+    // Return full user details (excluding password)
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    res.json({ token, user: userResponse });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
