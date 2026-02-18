@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { UserProvider } from "./context/UserContext";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/SignUP";
 import PatientDashboard from "./pages/patient/PatientDashboard";
@@ -10,6 +11,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import "./index.css"; // 🔥 REQUIRED
 function App() {
   return (
+    <UserProvider>
     <BrowserRouter>
       <ToastContainer
         position="top-right"
@@ -33,6 +35,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
+    </UserProvider>
   );
 }
 

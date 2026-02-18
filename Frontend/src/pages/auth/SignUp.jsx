@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authActions";
 import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
+import { useUser } from "../../context/UserContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { loginUserContext } = useUser();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,13 +29,17 @@ const SignUp = () => {
     qualifications: "",
     yearsOfExperience: "",
     availability: "",
+    chargesPerSession: "",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    // Reset gender when role changes so dropdown resets properly
+    if (name === 'role') {
+      setFormData({ ...formData, role: value, gender: '' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSignup = async (e) => {
@@ -59,34 +65,18 @@ const SignUp = () => {
       }
 
       if (formData.role === 'doctor') {
+        payload.gender = formData.gender;
         payload.specialty = formData.specialty;
         payload.qualifications = formData.qualifications;
         payload.yearsOfExperience = formData.yearsOfExperience;
         payload.availability = formData.availability;
+        payload.chargesPerSession = formData.chargesPerSession;
       }
 
       const data = await registerUser(payload);
 
-      // Save data to localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userName', data.user.fullName);
-      localStorage.setItem('userEmail', data.user.email);
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('isLoggedIn', 'true');
-
-      if (formData.role === 'patient') {
-        localStorage.setItem('patient_age', formData.age);
-        localStorage.setItem('patient_gender', formData.gender);
-        localStorage.setItem('patient_phone', formData.phone);
-        localStorage.setItem('patient_medicalHistory', formData.medicalHistory);
-      }
-
-      if (formData.role === 'doctor') {
-        localStorage.setItem('doctor_specialty', formData.specialty);
-        localStorage.setItem('doctor_qualifications', formData.qualifications);
-        localStorage.setItem('doctor_yearsOfExperience', formData.yearsOfExperience);
-        localStorage.setItem('doctor_availability', formData.availability);
-      }
+      // Store user data in context (replaces all localStorage calls)
+      loginUserContext(data.token, data.user);
 
       // Show success toast and navigate after a short delay
       toast.success(`${formData.username} has created account`);
@@ -238,16 +228,28 @@ const SignUp = () => {
 
         {formData.role === 'doctor' && (
           <>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Specialty</label>
-              <input
-                type="text"
-                name="specialty"
-                placeholder="e.g. Cardiology"
-                value={formData.specialty}
-                onChange={handleChange}
-                style={styles.input}
-              />
+            <div style={styles.row}>
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Specialty</label>
+                <input
+                  type="text"
+                  name="specialty"
+                  placeholder="e.g. Cardiology"
+                  value={formData.specialty}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Gender</label>
+                <select name="gender" value={formData.gender} onChange={handleChange} style={styles.input}>
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
 
             <div style={styles.inputGroup}>
@@ -274,16 +276,30 @@ const SignUp = () => {
               />
             </div>
 
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Availability (brief)</label>
-              <input
-                type="text"
-                name="availability"
-                placeholder="e.g. Mon-Fri 9:00-14:00"
-                value={formData.availability}
-                onChange={handleChange}
-                style={styles.input}
-              />
+            <div style={styles.row}>
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Availability (brief)</label>
+                <input
+                  type="text"
+                  name="availability"
+                  placeholder="e.g. Mon-Fri 9:00-14:00"
+                  value={formData.availability}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Charges Per Session (Rs)</label>
+                <input
+                  type="number"
+                  name="chargesPerSession"
+                  placeholder="e.g. 2000"
+                  value={formData.chargesPerSession}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
             </div>
           </>
         )}

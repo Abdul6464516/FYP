@@ -1,60 +1,118 @@
-import React, { useState } from "react";
-import { Search, Filter, Calendar, User } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Search, Calendar, User, Briefcase, Award } from "lucide-react";
+import { fetchDoctors } from "../../services/doctorAction";
+import { toast } from "react-toastify";
 
 const DoctorSearch = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [filter, setFilter] = useState({ specialty: "All", gender: "All" });
 
-  const doctors = [
-    { id: 1, name: "Dr. Raz", specialty: "Cardiology", gender: "Male", availability: "Today", rating: 4.9 },
-    { id: 2, name: "Dr. Sarah", specialty: "Dermatology", gender: "Female", availability: "Tomorrow", rating: 4.8 },
-    { id: 3, name: "Dr. Smith", specialty: "Neurology", gender: "Male", availability: "Today", rating: 4.7 },
-  ];
+  const loadDoctors = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchDoctors({
+        search,
+        specialty: filter.specialty,
+        gender: filter.gender,
+      });
+      setDoctors(data.doctors);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, filter]);
+
+  // Fetch doctors on mount and whenever search/filter changes
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      loadDoctors();
+    }, 400);
+    return () => clearTimeout(debounce);
+  }, [loadDoctors]);
+
+  // Build unique specialties from loaded doctors for the filter dropdown
+  const specialties = [...new Set(doctors.map((d) => d.specialty).filter(Boolean))];
 
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Find a Specialist</h2>
-      
+
       {/* SEARCH & FILTER BAR */}
       <div style={styles.searchBar}>
         <div style={styles.inputWrapper}>
           <Search size={18} color="#9ca3af" />
-          <input style={styles.input} placeholder="Search by doctor name or specialty..." />
+          <input
+            style={styles.input}
+            placeholder="Search by doctor name or specialty..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        
-        <select 
-          style={styles.select} 
-          onChange={(e) => setFilter({...filter, specialty: e.target.value})}
+
+        <select
+          style={styles.select}
+          value={filter.specialty}
+          onChange={(e) => setFilter({ ...filter, specialty: e.target.value })}
         >
           <option value="All">All Specialties</option>
-          <option value="Cardiology">Cardiology</option>
-          <option value="Dermatology">Dermatology</option>
+          {specialties.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
 
-        <select 
+        <select
           style={styles.select}
-          onChange={(e) => setFilter({...filter, gender: e.target.value})}
+          value={filter.gender}
+          onChange={(e) => setFilter({ ...filter, gender: e.target.value })}
         >
           <option value="All">Any Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
         </select>
       </div>
 
+      {/* LOADING STATE */}
+      {loading && (
+        <p style={{ textAlign: "center", color: "#6b7280", padding: "30px 0" }}>Loading doctors...</p>
+      )}
+
+      {/* NO RESULTS */}
+      {!loading && doctors.length === 0 && (
+        <p style={{ textAlign: "center", color: "#6b7280", padding: "30px 0" }}>No doctors found.</p>
+      )}
+
       {/* DOCTOR CARDS */}
-      <div style={styles.grid}>
-        {doctors.map(dr => (
-          <div key={dr.id} style={styles.card}>
-            <div style={styles.avatar}>{dr.name.charAt(4)}</div>
-            <h3 style={styles.drName}>{dr.name}</h3>
-            <p style={styles.drSpec}>{dr.specialty}</p>
-            <div style={styles.tagGroup}>
-              <span style={styles.tag}><User size={12} /> {dr.gender}</span>
-              <span style={styles.tag}><Calendar size={12} /> {dr.availability}</span>
+      {!loading && doctors.length > 0 && (
+        <div style={styles.grid}>
+          {doctors.map((dr) => (
+            <div key={dr._id} style={styles.card}>
+              <div style={styles.avatar}>
+                {dr.fullName ? dr.fullName.charAt(0).toUpperCase() : "D"}
+              </div>
+              <h3 style={styles.drName}>{dr.fullName}</h3>
+              <p style={styles.drSpec}>{dr.specialty || "General"}</p>
+              <div style={styles.tagGroup}>
+                {dr.gender && (
+                  <span style={styles.tag}><User size={12} /> {dr.gender.charAt(0).toUpperCase() + dr.gender.slice(1)}</span>
+                )}
+                {dr.availability && (
+                  <span style={styles.tag}><Calendar size={12} /> {dr.availability}</span>
+                )}
+                {dr.yearsOfExperience && (
+                  <span style={styles.tag}><Briefcase size={12} /> {dr.yearsOfExperience} yrs</span>
+                )}
+                {dr.qualifications && (
+                  <span style={styles.tag}><Award size={12} /> {dr.qualifications}</span>
+                )}
+              </div>
+              <button style={styles.bookBtn}>Book Consultation</button>
             </div>
-            <button style={styles.bookBtn}>Book Consultation</button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

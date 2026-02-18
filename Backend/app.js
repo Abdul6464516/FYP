@@ -11,21 +11,13 @@ app.use(cors());
 app.use(express.json());
 // mount auth routes
 const authRoutes = require('./routes/auth');
+const patientRoutes = require('./routes/patient');
+const doctorRoutes = require('./routes/doctor');
 app.use('/api/auth', authRoutes);
+app.use('/api/patient', patientRoutes);
+app.use('/api/doctor', doctorRoutes);
 connectDb();
-app.get("/test", async (req, res) => {
-  console.log(" hey ther i am testing");
-  console.log("Hey there we are welcoming ab by ghwarth level ");
-  const newPateint = new Patient({
-    name: "Abdul Javid",
-    gender: "male",
-    age: 24,
-    email: "abdul@example.com",
-    phone: "1234567890",
-  });
-  await newPateint.save();
-  res.json({ message: " Hey welcome to the telemedicine ", body: [3, 4, 2] });
-});
+
 app.listen(PORT, () => {
   console.log(`The server is running on the port ${PORT}`);
 });
