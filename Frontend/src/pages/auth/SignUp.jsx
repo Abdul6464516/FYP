@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authActions";
+import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 const SignUp = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -85,7 +88,12 @@ const SignUp = () => {
         localStorage.setItem('doctor_availability', formData.availability);
       }
 
-      navigate('/');
+      // Show success toast and navigate after a short delay
+      toast.success(`${formData.username} has created account`);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -141,15 +149,24 @@ const SignUp = () => {
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Create a strong password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
+          <div style={styles.passwordContainer}>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Create a strong password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              style={styles.passwordInput}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
         <div style={styles.inputGroup}>
@@ -318,6 +335,34 @@ const styles = {
   },
   inputGroup: {
     marginBottom: "15px",
+  },
+  passwordContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  passwordInput: {
+    width: '100%',
+    padding: '12px',
+    paddingRight: '45px',
+    borderRadius: '8px',
+    border: '1px solid #e6eefc',
+    boxSizing: 'border-box',
+    fontSize: '15px',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: '10px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    padding: '4px',
+    cursor: 'pointer',
+    color: '#666',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
   },
   row: {
     display: 'flex',

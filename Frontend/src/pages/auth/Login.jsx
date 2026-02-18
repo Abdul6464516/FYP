@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authActions";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,14 +48,19 @@ const Login = () => {
 
       console.log('Login successful for:', data.user.fullName);
 
-      // Navigate based on selected role
-      if (formData.role === 'patient') {
-        navigate('/patient');
-      } else if (formData.role === 'doctor') {
-        navigate('/doctor');
-      } else if (formData.role === 'admin') {
-        navigate('/admin');
-      }
+      // Show success toast
+      toast.success(`Welcome back, ${data.user.fullName}!`);
+
+      // Navigate based on selected role after a short delay
+      setTimeout(() => {
+        if (formData.role === 'patient') {
+          navigate('/patient');
+        } else if (formData.role === 'doctor') {
+          navigate('/doctor');
+        } else if (formData.role === 'admin') {
+          navigate('/admin');
+        }
+      }, 1000);
     } catch (err) {
       setError(err.message);
     } finally {
