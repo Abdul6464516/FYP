@@ -8,7 +8,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
 
 async function register(req, res) {
   try {
-    const { fullName, email, username, password, role } = req.body;
+    const { fullName, email, username, password, role,
+      // Patient fields
+      age, gender, phone, medicalHistory,
+      // Doctor fields
+      specialty, qualifications, yearsOfExperience, availability
+    } = req.body;
     if (!fullName || !email || !username || !password) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -16,7 +21,24 @@ async function register(req, res) {
     if (existing) return res.status(409).json({ message: 'Email or username already in use' });
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
-    const user = new User({ fullName, email, username, password: hash, role });
+
+    const userData = { fullName, email, username, password: hash, role };
+
+    if (role === 'patient') {
+      userData.age = age;
+      userData.gender = gender;
+      userData.phone = phone;
+      userData.medicalHistory = medicalHistory;
+    }
+
+    if (role === 'doctor') {
+      userData.specialty = specialty;
+      userData.qualifications = qualifications;
+      userData.yearsOfExperience = yearsOfExperience;
+      userData.availability = availability;
+    }
+
+    const user = new User(userData);
     await user.save();
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ token, user: { id: user._id, fullName: user.fullName, email: user.email, username: user.username, role: user.role } });
