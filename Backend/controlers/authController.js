@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
 
 async function register(req, res) {
   try {
-    const { fullName, email, username, password, role,
+    const { fullName, email, username, password, role, city,
       // Patient fields
       age, gender, phone, medicalHistory,
       // Doctor fields
@@ -22,7 +22,7 @@ async function register(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const userData = { fullName, email, username, password: hash, role };
+    const userData = { fullName, email, username, password: hash, role, city };
 
     if (role === 'patient') {
       userData.age = age;
