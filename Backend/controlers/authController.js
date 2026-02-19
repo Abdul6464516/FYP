@@ -33,6 +33,7 @@ async function register(req, res) {
 
     if (role === 'doctor') {
       userData.gender = gender;
+      userData.phone = phone;
       userData.specialty = specialty;
       userData.qualifications = qualifications;
       userData.yearsOfExperience = yearsOfExperience;

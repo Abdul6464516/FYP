@@ -38,3 +38,36 @@ export async function updateDoctorProfile(profileData) {
     throw new Error(msg);
   }
 }
+
+// Fetch all appointments for the logged-in doctor
+export async function getDoctorAppointments() {
+  try {
+    const res = await api.get('/doctor/appointments');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch appointments';
+    throw new Error(msg);
+  }
+}
+
+// Approve an appointment
+export async function approveAppointment(appointmentId, remarks = '') {
+  try {
+    const res = await api.put(`/doctor/appointment/${appointmentId}/approve`, { remarks });
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to approve appointment';
+    throw new Error(msg);
+  }
+}
+
+// Cancel/reject an appointment
+export async function cancelAppointmentByDoctor(appointmentId, remarks = '') {
+  try {
+    const res = await api.put(`/doctor/appointment/${appointmentId}/cancel`, { remarks });
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to cancel appointment';
+    throw new Error(msg);
+  }
+}

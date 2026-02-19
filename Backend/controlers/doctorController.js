@@ -1,4 +1,70 @@
 const User = require('../models/User');
+const Appointment = require('../models/Appointment');
+
+// GET /api/doctor/appointments — fetch all appointments for the logged-in doctor
+async function getDoctorAppointments(req, res) {
+  try {
+    const appointments = await Appointment.find({ doctor: req.user.id })
+      .populate('patient', 'fullName email phone age gender city')
+      .sort({ createdAt: -1 });
+
+    res.json({ appointments });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// PUT /api/doctor/appointment/:id/approve — approve an appointment
+async function approveAppointment(req, res) {
+  try {
+    const appointment = await Appointment.findOne({ _id: req.params.id, doctor: req.user.id });
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+
+    if (appointment.status !== 'pending') {
+      return res.status(400).json({ message: `Cannot approve an appointment that is already ${appointment.status}` });
+    }
+
+    appointment.status = 'approved';
+    appointment.doctorRemarks = req.body.remarks || '';
+    await appointment.save();
+
+    const populated = await Appointment.findById(appointment._id)
+      .populate('patient', 'fullName email phone age gender city');
+
+    res.json({ message: 'Appointment approved', appointment: populated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// PUT /api/doctor/appointment/:id/cancel — cancel/reject an appointment
+async function cancelAppointmentByDoctor(req, res) {
+  try {
+    const appointment = await Appointment.findOne({ _id: req.params.id, doctor: req.user.id });
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+
+    if (appointment.status === 'cancelled') {
+      return res.status(400).json({ message: 'Appointment is already cancelled' });
+    }
+    if (appointment.status === 'completed') {
+      return res.status(400).json({ message: 'Cannot cancel a completed appointment' });
+    }
+
+    appointment.status = 'cancelled';
+    appointment.doctorRemarks = req.body.remarks || '';
+    await appointment.save();
+
+    const populated = await Appointment.findById(appointment._id)
+      .populate('patient', 'fullName email phone age gender city');
+
+    res.json({ message: 'Appointment cancelled', appointment: populated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
 
 // GET /api/doctor/list — fetch all doctors (public, for patient search)
 async function getAllDoctors(req, res) {
@@ -53,11 +119,11 @@ async function getDoctorProfile(req, res) {
 // PUT /api/doctor/profile — update logged-in doctor's profile
 async function updateDoctorProfile(req, res) {
   try {
-    const { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city } = req.body;
+    const { fullName, gender, phone, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city },
+      { fullName, gender, phone, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city },
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -70,4 +136,4 @@ async function updateDoctorProfile(req, res) {
   }
 }
 
-module.exports = { getAllDoctors, getDoctorProfile, updateDoctorProfile };
+module.exports = { getAllDoctors, getDoctorProfile, updateDoctorProfile, getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor };
