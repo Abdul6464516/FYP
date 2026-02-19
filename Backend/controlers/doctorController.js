@@ -3,7 +3,7 @@ const User = require('../models/User');
 // GET /api/doctor/list — fetch all doctors (public, for patient search)
 async function getAllDoctors(req, res) {
   try {
-    const { specialty, gender, search } = req.query;
+    const { specialty, availability, city, search } = req.query;
 
     const filter = { role: 'doctor' };
 
@@ -11,19 +11,24 @@ async function getAllDoctors(req, res) {
       filter.specialty = { $regex: specialty, $options: 'i' };
     }
 
-    if (gender && gender !== 'All') {
-      filter.gender = gender.toLowerCase();
+    if (availability && availability !== 'All') {
+      filter.availability = { $regex: availability, $options: 'i' };
+    }
+
+    if (city && city !== 'All') {
+      filter.city = { $regex: city, $options: 'i' };
     }
 
     if (search) {
       filter.$or = [
         { fullName: { $regex: search, $options: 'i' } },
         { specialty: { $regex: search, $options: 'i' } },
+        { city: { $regex: search, $options: 'i' } },
       ];
     }
 
     const doctors = await User.find(filter).select(
-      'fullName specialty gender qualifications yearsOfExperience availability chargesPerSession'
+      'fullName specialty gender qualifications yearsOfExperience availability chargesPerSession city'
     );
 
     res.json({ doctors });
@@ -48,11 +53,11 @@ async function getDoctorProfile(req, res) {
 // PUT /api/doctor/profile — update logged-in doctor's profile
 async function updateDoctorProfile(req, res) {
   try {
-    const { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession } = req.body;
+    const { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession },
+      { fullName, gender, specialty, qualifications, yearsOfExperience, availability, chargesPerSession, city },
       { new: true, runValidators: true }
     ).select('-password');
 

@@ -1,12 +1,13 @@
 import api from './apiClient';
 
 // Fetch all doctors with optional filters
-export async function fetchDoctors({ search, specialty, gender } = {}) {
+export async function fetchDoctors({ search, specialty, availability, city } = {}) {
   try {
     const params = {};
     if (search) params.search = search;
     if (specialty && specialty !== 'All') params.specialty = specialty;
-    if (gender && gender !== 'All') params.gender = gender;
+    if (availability && availability !== 'All') params.availability = availability;
+    if (city && city !== 'All') params.city = city;
 
     const res = await api.get('/doctor/list', { params });
     return res.data;

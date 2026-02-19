@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authActions";
 import { toast } from "react-toastify";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, DollarSign } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 
 const SignUp = () => {
@@ -24,6 +24,7 @@ const SignUp = () => {
     gender: "",
     phone: "",
     medicalHistory: "",
+    city: "",
     // doctor fields
     specialty: "",
     qualifications: "",
@@ -62,6 +63,7 @@ const SignUp = () => {
         payload.gender = formData.gender;
         payload.phone = formData.phone;
         payload.medicalHistory = formData.medicalHistory;
+        payload.city = formData.city;
       }
 
       if (formData.role === 'doctor') {
@@ -71,6 +73,7 @@ const SignUp = () => {
         payload.yearsOfExperience = formData.yearsOfExperience;
         payload.availability = formData.availability;
         payload.chargesPerSession = formData.chargesPerSession;
+        payload.city = formData.city;
       }
 
       const data = await registerUser(payload);
@@ -81,9 +84,18 @@ const SignUp = () => {
       // Show success toast and navigate after a short delay
       toast.success(`${formData.username} has created account`);
 
+      // Redirect to appropriate dashboard based on role
       setTimeout(() => {
-        navigate('/');
-      }, 3000);
+        if (data.user.role === 'patient') {
+          navigate('/patient');
+        } else if (data.user.role === 'doctor') {
+          navigate('/doctor');
+        } else if (data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      }, 1000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -223,6 +235,18 @@ const SignUp = () => {
                 />
               </div>
             </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>City</label>
+              <input
+                type="text"
+                name="city"
+                placeholder="e.g. Lahore"
+                value={formData.city}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
           </>
         )}
 
@@ -290,16 +314,28 @@ const SignUp = () => {
               </div>
 
               <div style={{ ...styles.inputGroup, ...styles.half }}>
-                <label style={styles.label}>Charges Per Session (Rs)</label>
+                <label style={styles.label}>Charges Per Session <DollarSign size={16} style={{ display: 'inline', verticalAlign: 'middle' }} /></label>
                 <input
                   type="number"
                   name="chargesPerSession"
-                  placeholder="e.g. 2000"
+                  placeholder="e.g. $2000"
                   value={formData.chargesPerSession}
                   onChange={handleChange}
                   style={styles.input}
                 />
               </div>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>City</label>
+              <input
+                type="text"
+                name="city"
+                placeholder="e.g. Karachi"
+                value={formData.city}
+                onChange={handleChange}
+                style={styles.input}
+              />
             </div>
           </>
         )}
@@ -419,7 +455,7 @@ const styles = {
   loginBtn: {
     width: "100%",
     padding: "12px",
-    background: "linear-gradient(90deg,#3b82f6,#007bff)",
+    background: "linear-gradient(90deg,#4caf50,#28a745)",
     color: "#fff",
     border: "none",
     borderRadius: "8px",

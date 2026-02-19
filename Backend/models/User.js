@@ -14,6 +14,9 @@ const userSchema = new Schema({
   phone: { type: String },
   medicalHistory: { type: String },
 
+  // Common optional field
+  city: { type: String },
+
   // Doctor-specific fields
   specialty: { type: String },
   qualifications: { type: String },

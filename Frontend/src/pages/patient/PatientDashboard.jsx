@@ -17,11 +17,11 @@ import { clearSession } from "../../services/auth";
 // --- COMPONENT IMPORTS ---
 import PatientProfile from "../../Components/Patient/PatientProfile";
 import VideoCall from "../../Components/Patient/VideoCall";
-import AppointmentBooking from "../../Components/Patient/AppointmentBooking";
+import AppointmentBooking from "../../Components/Patient/AppointmentBooking"; 
 import PrescriptionAccess from "../../Components/Patient/PerscriptionAccess";
 import MedicalRecords from "../../Components/Patient/MedicalRecords";
 import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
-import DoctorSearch from "../../Components/Patient/DoctorSearch"; // 1. Added DoctorSearch Import
+
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -46,12 +46,8 @@ const PatientDashboard = () => {
 
   const menuItems = [
     { id: "Profile", icon: <User size={20} />, label: "Profile" },
-    { id: "Search", icon: <Search size={20} />, label: "Find a Doctor" }, // 2. Added Search to Menu
-    {
-      id: "Appointments",
-      icon: <Calendar size={20} />,
-      label: "Book Appointment",
-    },
+    { id: "Appointments", icon: <Calendar size={20} />, label: "Book Appointment" }, // 2. Added Search to Menu
+  
     { id: "Consultation", icon: <Video size={20} />, label: "Video Call" },
     {
       id: "Prescriptions",
@@ -126,9 +122,8 @@ const PatientDashboard = () => {
         <main style={styles.contentBody}>
           <div style={styles.card}>
             {activeTab === "Profile" && <PatientProfile />}
-            {activeTab === "Search" && <DoctorSearch />}{" "}
+            {activeTab === "Appointments" && <AppointmentBooking />}{" "}
             {/* 3. Added Search Rendering */}
-            {activeTab === "Appointments" && <AppointmentBooking />}
             {activeTab === "Consultation" && <VideoCall />}
             {activeTab === "Prescriptions" && <PrescriptionAccess />}
             {activeTab === "Records" && <MedicalRecords />}
