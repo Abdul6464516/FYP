@@ -7,6 +7,7 @@ import Signup from "./pages/auth/SignUP";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 import "./index.css"; // 🔥 REQUIRED
 function App() {
@@ -30,9 +31,21 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route path="/patient" element={<PatientDashboard />} />
-        <Route path="/doctor" element={<DoctorDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/patient" element={
+          <ProtectedRoute allowedRole="patient">
+            <PatientDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/doctor" element={
+          <ProtectedRoute allowedRole="doctor">
+            <DoctorDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
     </UserProvider>

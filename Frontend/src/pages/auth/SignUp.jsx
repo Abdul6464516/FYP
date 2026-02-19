@@ -68,6 +68,7 @@ const SignUp = () => {
 
       if (formData.role === 'doctor') {
         payload.gender = formData.gender;
+        payload.phone = formData.phone;
         payload.specialty = formData.specialty;
         payload.qualifications = formData.qualifications;
         payload.yearsOfExperience = formData.yearsOfExperience;
@@ -274,6 +275,18 @@ const SignUp = () => {
                   <option value="other">Other</option>
                 </select>
               </div>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Contact Number</label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="e.g. +1234567890"
+                value={formData.phone}
+                onChange={handleChange}
+                style={styles.input}
+              />
             </div>
 
             <div style={styles.inputGroup}>

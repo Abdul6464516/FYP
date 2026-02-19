@@ -41,3 +41,36 @@ export async function getMyFeedbacks() {
     throw new Error(msg);
   }
 }
+
+// Book an appointment with a doctor
+export async function bookAppointment({ doctor, date, time, type, reason, notes }) {
+  try {
+    const res = await api.post('/patient/appointment', { doctor, date, time, type, reason, notes });
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to book appointment';
+    throw new Error(msg);
+  }
+}
+
+// Get all appointments of the logged-in patient
+export async function getMyAppointments() {
+  try {
+    const res = await api.get('/patient/appointments');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch appointments';
+    throw new Error(msg);
+  }
+}
+
+// Cancel an appointment
+export async function cancelAppointment(appointmentId) {
+  try {
+    const res = await api.put(`/patient/appointment/${appointmentId}/cancel`);
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to cancel appointment';
+    throw new Error(msg);
+  }
+}
