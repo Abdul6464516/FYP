@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
+const Prescription = require('../models/Prescription');
+const Consultation = require('../models/Consultation');
 
 // GET /api/doctor/appointments — fetch all appointments for the logged-in doctor
 async function getDoctorAppointments(req, res) {
@@ -136,4 +138,116 @@ async function updateDoctorProfile(req, res) {
   }
 }
 
-module.exports = { getAllDoctors, getDoctorProfile, updateDoctorProfile, getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor };
+// GET /api/doctor/completed-patients — patients whose consultation/appointment is completed
+async function getCompletedPatients(req, res) {
+  try {
+    const appointments = await Appointment.find({
+      doctor: req.user.id,
+      status: 'completed',
+    })
+      .populate('patient', 'fullName email phone age gender city')
+      .sort({ updatedAt: -1 });
+
+    // Deduplicate patients (a patient may have multiple completed appointments)
+    const seen = new Set();
+    const patients = [];
+    for (const appt of appointments) {
+      if (appt.patient && !seen.has(appt.patient._id.toString())) {
+        seen.add(appt.patient._id.toString());
+        patients.push({
+          _id: appt.patient._id,
+          fullName: appt.patient.fullName,
+          email: appt.patient.email,
+          phone: appt.patient.phone,
+          age: appt.patient.age,
+          gender: appt.patient.gender,
+          city: appt.patient.city,
+          lastAppointmentId: appt._id,
+          lastAppointmentDate: appt.date,
+        });
+      }
+    }
+
+    res.json({ patients });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// POST /api/doctor/prescription — create a new prescription
+async function createPrescription(req, res) {
+  try {
+    const { patient, appointment, consultation, medications, instructions, diagnosis } = req.body;
+
+    if (!patient || !medications || medications.length === 0) {
+      return res.status(400).json({ message: 'Patient and at least one medication are required' });
+    }
+
+    // Verify this patient had a completed appointment with this doctor
+    const completedAppt = await Appointment.findOne({
+      doctor: req.user.id,
+      patient,
+      status: 'completed',
+    });
+    if (!completedAppt) {
+      return res.status(400).json({ message: 'No completed consultation found for this patient' });
+    }
+
+    const prescription = await Prescription.create({
+      doctor: req.user.id,
+      patient,
+      appointment: appointment || completedAppt._id,
+      consultation: consultation || undefined,
+      medications,
+      instructions: instructions || '',
+      diagnosis: diagnosis || '',
+      status: 'sent',
+    });
+
+    const populated = await Prescription.findById(prescription._id)
+      .populate('doctor', 'fullName specialty qualifications')
+      .populate('patient', 'fullName email phone age gender');
+
+    res.status(201).json({ message: 'Prescription created successfully', prescription: populated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// GET /api/doctor/prescriptions — get all prescriptions created by the doctor
+async function getDoctorPrescriptions(req, res) {
+  try {
+    const prescriptions = await Prescription.find({ doctor: req.user.id })
+      .populate('doctor', 'fullName specialty')
+      .populate('patient', 'fullName email phone age gender')
+      .sort({ createdAt: -1 });
+
+    res.json({ prescriptions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// GET /api/doctor/prescription/:id — get single prescription
+async function getPrescriptionById(req, res) {
+  try {
+    const prescription = await Prescription.findOne({ _id: req.params.id, doctor: req.user.id })
+      .populate('doctor', 'fullName specialty qualifications')
+      .populate('patient', 'fullName email phone age gender city');
+
+    if (!prescription) return res.status(404).json({ message: 'Prescription not found' });
+    res.json({ prescription });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+module.exports = {
+  getAllDoctors, getDoctorProfile, updateDoctorProfile,
+  getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
+  getCompletedPatients, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+};

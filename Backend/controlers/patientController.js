@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Feedback = require('../models/Feedback');
 const Appointment = require('../models/Appointment');
+const Prescription = require('../models/Prescription');
 
 // POST /api/patient/appointment — book an appointment
 async function bookAppointment(req, res) {
@@ -169,4 +170,25 @@ async function getMyFeedbacks(req, res) {
   }
 }
 
-module.exports = { getProfile, updateProfile, submitFeedback, getMyFeedbacks, bookAppointment, getMyAppointments, cancelAppointment };
+// GET /api/patient/prescriptions — get all prescriptions for the logged-in patient
+async function getMyPrescriptions(req, res) {
+  try {
+    const prescriptions = await Prescription.find({ patient: req.user.id })
+      .populate('doctor', 'fullName specialty qualifications phone city')
+      .populate('appointment', 'date time type')
+      .sort({ createdAt: -1 });
+
+    // Mark as viewed
+    await Prescription.updateMany(
+      { patient: req.user.id, status: 'sent' },
+      { status: 'viewed' }
+    );
+
+    res.json({ prescriptions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+module.exports = { getProfile, updateProfile, submitFeedback, getMyFeedbacks, bookAppointment, getMyAppointments, cancelAppointment, getMyPrescriptions };

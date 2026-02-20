@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getAllDoctors, getDoctorProfile, updateDoctorProfile, getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor } = require('../controlers/doctorController');
+const {
+  getAllDoctors, getDoctorProfile, updateDoctorProfile,
+  getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
+  getCompletedPatients, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+} = require('../controlers/doctorController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
 // Public route — any logged-in user can search doctors
@@ -12,5 +16,11 @@ router.put('/profile', verifyToken, requireRole('doctor'), updateDoctorProfile);
 router.get('/appointments', verifyToken, requireRole('doctor'), getDoctorAppointments);
 router.put('/appointment/:id/approve', verifyToken, requireRole('doctor'), approveAppointment);
 router.put('/appointment/:id/cancel', verifyToken, requireRole('doctor'), cancelAppointmentByDoctor);
+
+// Prescription routes
+router.get('/completed-patients', verifyToken, requireRole('doctor'), getCompletedPatients);
+router.post('/prescription', verifyToken, requireRole('doctor'), createPrescription);
+router.get('/prescriptions', verifyToken, requireRole('doctor'), getDoctorPrescriptions);
+router.get('/prescription/:id', verifyToken, requireRole('doctor'), getPrescriptionById);
 
 module.exports = router;
