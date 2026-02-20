@@ -71,3 +71,47 @@ export async function cancelAppointmentByDoctor(appointmentId, remarks = '') {
     throw new Error(msg);
   }
 }
+
+// Fetch patients whose consultation was completed with this doctor
+export async function getCompletedPatients() {
+  try {
+    const res = await api.get('/doctor/completed-patients');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch patients';
+    throw new Error(msg);
+  }
+}
+
+// Create a prescription
+export async function createPrescription(prescriptionData) {
+  try {
+    const res = await api.post('/doctor/prescription', prescriptionData);
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to create prescription';
+    throw new Error(msg);
+  }
+}
+
+// Get all prescriptions created by the doctor
+export async function getDoctorPrescriptions() {
+  try {
+    const res = await api.get('/doctor/prescriptions');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch prescriptions';
+    throw new Error(msg);
+  }
+}
+
+// Get single prescription by ID
+export async function getPrescriptionById(id) {
+  try {
+    const res = await api.get(`/doctor/prescription/${id}`);
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch prescription';
+    throw new Error(msg);
+  }
+}

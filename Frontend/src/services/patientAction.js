@@ -74,3 +74,14 @@ export async function cancelAppointment(appointmentId) {
     throw new Error(msg);
   }
 }
+
+// Get all prescriptions for the logged-in patient
+export async function getMyPrescriptions() {
+  try {
+    const res = await api.get('/patient/prescriptions');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch prescriptions';
+    throw new Error(msg);
+  }
+}
