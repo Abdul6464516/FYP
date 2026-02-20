@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // On mount, restore session from localStorage
   useEffect(() => {
@@ -23,6 +24,7 @@ export const UserProvider = ({ children }) => {
         localStorage.clear();
       }
     }
+    setLoading(false);
   }, []);
 
   // Called after successful login or signup
@@ -54,7 +56,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, token, isLoggedIn, loginUserContext, logoutUser, updateUserContext }}>
+    <UserContext.Provider value={{ user, token, isLoggedIn, loading, loginUserContext, logoutUser, updateUserContext }}>
       {children}
     </UserContext.Provider>
   );

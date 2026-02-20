@@ -1,73 +1,48 @@
 import { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useUser } from "../context/UserContext";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
-  const token = localStorage.getItem("token");
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
-  const userRole = localStorage.getItem("userRole");
+  const { user, isLoggedIn, loading } = useUser();
   const toastShown = useRef(false);
 
-  const isAuthenticated = token && isLoggedIn === "true";
-  const hasCorrectRole = !allowedRole || userRole === allowedRole;
+  const hasCorrectRole = !allowedRole || (user && user.role === allowedRole);
 
   useEffect(() => {
+    if (loading) return; // wait until session is restored
+
     if (!toastShown.current) {
-      if (!isAuthenticated) {
-        toast.error("You must login to access your dashboard");
+      if (!isLoggedIn || !user) {
+        toast.error("You must be logged in to access your dashboard");
         toastShown.current = true;
       } else if (!hasCorrectRole) {
         toast.error("You are not authorized to access this dashboard");
         toastShown.current = true;
       }
     }
-  }, [isAuthenticated, hasCorrectRole]);
+  }, [loading, isLoggedIn, user, hasCorrectRole]);
 
-  // Not authenticated at all → go to login
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+  // Wait for session restore before making any decision
+  if (loading) {
+    return null;
   }
 
-  // Authenticated but wrong role → go to login
-  if (!hasCorrectRole) {
-    return <Navigate to="/" replace />;
-  }
-
-import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useUser } from '../context/UserContext';
-import { toast } from 'react-toastify';
-
-const roleDashboard = {
-  patient: '/patient',
-  doctor: '/doctor',
-  admin: '/admin',
-};
-
-const ProtectedRoute = ({ allowedRole, children }) => {
-  const { user, isLoggedIn } = useUser();
-
-  const isUnauthorized = isLoggedIn && user && user.role !== allowedRole;
-
-  useEffect(() => {
-    if (!isLoggedIn || !user) {
-        console.log("Hey",user,isLoggedIn);
-    } else if (isUnauthorized) {
-      toast.error(`Access denied! Redirecting to your ${user.role} dashboard`);
-    }
-  }, [isLoggedIn, user, isUnauthorized]);
-
-  // Not logged in — redirect to login
+  // Not authenticated → go to login
   if (!isLoggedIn || !user) {
     return <Navigate to="/" replace />;
   }
 
-  // Logged in but wrong role — redirect to their own dashboard
-  if (isUnauthorized) {
-    return <Navigate to={roleDashboard[user.role] || '/'} replace />;
+  // Authenticated but wrong role → redirect to their own dashboard
+  if (!hasCorrectRole) {
+    const roleDashboard = {
+      patient: "/patient",
+      doctor: "/doctor",
+      admin: "/admin",
+    };
+    return <Navigate to={roleDashboard[user.role] || "/"} replace />;
   }
 
-  // Authorized — render the page
   return children;
 };
 
