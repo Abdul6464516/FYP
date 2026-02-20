@@ -115,3 +115,14 @@ export async function getPrescriptionById(id) {
     throw new Error(msg);
   }
 }
+
+// Fetch full medical history for a patient with this doctor
+export async function getPatientHistory(patientId) {
+  try {
+    const res = await api.get(`/doctor/patient/${patientId}/history`);
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch patient history';
+    throw new Error(msg);
+  }
+}

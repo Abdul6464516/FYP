@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   getAllDoctors, getDoctorProfile, updateDoctorProfile,
   getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
-  getCompletedPatients, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+  getCompletedPatients, getPatientHistory, createPrescription, getDoctorPrescriptions, getPrescriptionById,
 } = require('../controlers/doctorController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
@@ -19,6 +19,7 @@ router.put('/appointment/:id/cancel', verifyToken, requireRole('doctor'), cancel
 
 // Prescription routes
 router.get('/completed-patients', verifyToken, requireRole('doctor'), getCompletedPatients);
+router.get('/patient/:id/history', verifyToken, requireRole('doctor'), getPatientHistory);
 router.post('/prescription', verifyToken, requireRole('doctor'), createPrescription);
 router.get('/prescriptions', verifyToken, requireRole('doctor'), getDoctorPrescriptions);
 router.get('/prescription/:id', verifyToken, requireRole('doctor'), getPrescriptionById);

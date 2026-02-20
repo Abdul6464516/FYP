@@ -246,8 +246,112 @@ async function getPrescriptionById(req, res) {
   }
 }
 
+// GET /api/doctor/patient/:id/history — full medical history for a patient with this doctor
+async function getPatientHistory(req, res) {
+  try {
+    const patientId = req.params.id;
+    const doctorId = req.user.id;
+
+    // Verify the patient exists
+    const patient = await User.findById(patientId).select('fullName email phone age gender city medicalHistory');
+    if (!patient) return res.status(404).json({ message: 'Patient not found' });
+
+    // All appointments between this doctor and patient
+    const appointments = await Appointment.find({ doctor: doctorId, patient: patientId })
+      .sort({ date: -1 });
+
+    // All consultations between this doctor and patient
+    const consultations = await Consultation.find({ doctor: doctorId, patient: patientId })
+      .populate('appointment', 'date time type reason')
+      .sort({ createdAt: -1 });
+
+    // All prescriptions this doctor wrote for this patient
+    const prescriptions = await Prescription.find({ doctor: doctorId, patient: patientId })
+      .sort({ createdAt: -1 });
+
+    // Build a unified timeline
+    const timeline = [];
+
+    for (const appt of appointments) {
+      timeline.push({
+        type: 'appointment',
+        date: appt.date,
+        data: {
+          _id: appt._id,
+          date: appt.date,
+          time: appt.time,
+          status: appt.status,
+          appointmentType: appt.type,
+          reason: appt.reason || '',
+          notes: appt.notes || '',
+          doctorRemarks: appt.doctorRemarks || '',
+          fee: appt.fee,
+        },
+      });
+    }
+
+    for (const con of consultations) {
+      timeline.push({
+        type: 'consultation',
+        date: con.startedAt || con.createdAt,
+        data: {
+          _id: con._id,
+          status: con.status,
+          startedAt: con.startedAt,
+          endedAt: con.endedAt,
+          duration: con.duration,
+          notes: con.notes || '',
+          appointmentDate: con.appointment?.date,
+          appointmentType: con.appointment?.type,
+        },
+      });
+    }
+
+    for (const rx of prescriptions) {
+      timeline.push({
+        type: 'prescription',
+        date: rx.createdAt,
+        data: {
+          _id: rx._id,
+          diagnosis: rx.diagnosis || '',
+          medications: rx.medications,
+          instructions: rx.instructions || '',
+          status: rx.status,
+          createdAt: rx.createdAt,
+        },
+      });
+    }
+
+    // Sort the timeline by date descending
+    timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json({
+      patient: {
+        _id: patient._id,
+        fullName: patient.fullName,
+        email: patient.email,
+        phone: patient.phone,
+        age: patient.age,
+        gender: patient.gender,
+        city: patient.city,
+        medicalHistory: patient.medicalHistory || '',
+      },
+      summary: {
+        totalAppointments: appointments.length,
+        completedAppointments: appointments.filter(a => a.status === 'completed').length,
+        totalConsultations: consultations.length,
+        totalPrescriptions: prescriptions.length,
+      },
+      timeline,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 module.exports = {
   getAllDoctors, getDoctorProfile, updateDoctorProfile,
   getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
-  getCompletedPatients, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+  getCompletedPatients, getPatientHistory, createPrescription, getDoctorPrescriptions, getPrescriptionById,
 };
