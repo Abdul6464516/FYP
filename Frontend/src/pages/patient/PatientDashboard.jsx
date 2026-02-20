@@ -12,7 +12,7 @@ import {
   X,
   Search,
 } from "lucide-react";
-import { clearSession } from "../../services/auth";
+import { useUser } from "../../context/UserContext";
 
 // --- COMPONENT IMPORTS ---
 import PatientProfile from "../../Components/Patient/PatientProfile";
@@ -25,22 +25,16 @@ import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
+  const { user, logoutUser } = useUser();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState("");
 
-  useEffect(() => {
-    const savedName = localStorage.getItem("userName");
-    const savedRole = localStorage.getItem("userRole") || "Patient";
-
-    if (savedName) setUserName(savedName);
-    setUserRole(savedRole);
-  }, []);
+  const userName = user?.fullName || "";
+  const userRole = user?.role || "Patient";
 
   const handleLogout = () => {
-    // clear only auth/session keys and redirect
-    clearSession();
+    logoutUser();
+    sessionStorage.clear();
     navigate('/');
   };
 
