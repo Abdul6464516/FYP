@@ -1,41 +1,93 @@
-import React, { useState } from "react";
-import { Check, X, Clock, Calendar, User, AlertCircle } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Check, X, Clock, Calendar, User, AlertCircle, MapPin, Phone, DollarSign, FileText } from "lucide-react";
+import { getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor } from "../../services/doctorAction";
+import { toast } from "react-toastify";
 
 const AppointmentManagement = () => {
-  // Mock data for display
-  const [appointments, setAppointments] = useState([
-    { id: 1, patient: "John Doe", date: "2023-10-25", time: "10:30 AM", status: "Pending", type: "Video Call" },
-    { id: 2, patient: "Jane Smith", date: "2023-10-25", time: "11:45 AM", status: "Approved", type: "In-Person" },
-    { id: 3, patient: "Robert Brown", date: "2023-10-26", time: "09:00 AM", status: "Pending", type: "Video Call" },
-  ]);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null); // track which appointment action is in progress
 
-  const updateStatus = (id, newStatus) => {
-    setAppointments(appointments.map(app => 
-      app.id === id ? { ...app, status: newStatus } : app
-    ));
+  const loadAppointments = useCallback(async () => {
+    try {
+      const data = await getDoctorAppointments();
+      setAppointments(data.appointments);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
+
+  const handleApprove = async (id) => {
+    setActionLoading(id);
+    try {
+      const data = await approveAppointment(id);
+      setAppointments((prev) =>
+        prev.map((a) => (a._id === id ? data.appointment : a))
+      );
+      toast.success("Appointment approved");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(null);
+    }
   };
+
+  const handleCancel = async (id) => {
+    setActionLoading(id);
+    try {
+      const data = await cancelAppointmentByDoctor(id);
+      setAppointments((prev) =>
+        prev.map((a) => (a._id === id ? data.appointment : a))
+      );
+      toast.success("Appointment cancelled");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const pendingCount = appointments.filter((a) => a.status === "pending").length;
+
+  if (loading) {
+    return <p style={{ textAlign: "center", color: "#6b7280", padding: "30px 0" }}>Loading appointments...</p>;
+  }
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <h4 style={styles.title}>Appointment Requests</h4>
-        <span style={styles.countBadge}>{appointments.filter(a => a.status === 'Pending').length} New</span>
+        {pendingCount > 0 && (
+          <span style={styles.countBadge}>{pendingCount} New</span>
+        )}
       </div>
+
+      {appointments.length === 0 && (
+        <p style={{ textAlign: "center", color: "#6b7280", padding: "30px 0" }}>No appointment requests yet.</p>
+      )}
 
       <div style={styles.list}>
         {appointments.map((app) => (
-          <div key={app.id} style={styles.appointmentCard}>
+          <div key={app._id} style={styles.appointmentCard}>
             <div style={styles.cardInfo}>
+              {/* Patient name + status */}
               <div style={styles.patientRow}>
                 <div style={styles.avatar}>
-                  <User size={18} />
+                  {app.patient?.fullName ? app.patient.fullName.charAt(0).toUpperCase() : <User size={18} />}
                 </div>
-                <span style={styles.patientName}>{app.patient}</span>
-                <span style={{...styles.statusBadge, ...getStatusStyle(app.status)}}>
+                <span style={styles.patientName}>{app.patient?.fullName || "Unknown"}</span>
+                <span style={{ ...styles.statusBadge, ...getStatusStyle(app.status) }}>
                   {app.status}
                 </span>
               </div>
 
+              {/* Date, Time, Type */}
               <div style={styles.dateTimeRow}>
                 <div style={styles.infoItem}>
                   <Calendar size={14} style={styles.icon} />
@@ -47,38 +99,70 @@ const AppointmentManagement = () => {
                 </div>
                 <div style={styles.infoItem}>
                   <AlertCircle size={14} style={styles.icon} />
-                  <span>{app.type}</span>
+                  <span style={{ textTransform: "capitalize" }}>{app.type}</span>
                 </div>
+                {app.fee > 0 && (
+                  <div style={styles.infoItem}>
+                    <DollarSign size={14} style={styles.icon} />
+                    <span>${app.fee}</span>
+                  </div>
+                )}
               </div>
+
+              {/* Extra details row */}
+              <div style={{ ...styles.dateTimeRow, marginTop: "8px" }}>
+                {app.patient?.phone && (
+                  <div style={styles.infoItem}>
+                    <Phone size={14} style={styles.icon} />
+                    <span>{app.patient.phone}</span>
+                  </div>
+                )}
+                {app.patient?.city && (
+                  <div style={styles.infoItem}>
+                    <MapPin size={14} style={styles.icon} />
+                    <span>{app.patient.city}</span>
+                  </div>
+                )}
+                {app.reason && (
+                  <div style={styles.infoItem}>
+                    <FileText size={14} style={styles.icon} />
+                    <span>{app.reason}</span>
+                  </div>
+                )}
+              </div>
+
+              {app.notes && (
+                <p style={styles.notes}><strong>Notes:</strong> {app.notes}</p>
+              )}
             </div>
 
             <div style={styles.actionButtons}>
-              {app.status === "Pending" && (
+              {app.status === "pending" && (
                 <>
-                  <button 
-                    onClick={() => updateStatus(app.id, "Approved")}
+                  <button
+                    onClick={() => handleApprove(app._id)}
                     style={styles.approveBtn}
+                    disabled={actionLoading === app._id}
                   >
-                    <Check size={18} /> Approve
+                    <Check size={18} /> {actionLoading === app._id ? "..." : "Approve"}
                   </button>
-                  <button 
-                    onClick={() => updateStatus(app.id, "Cancelled")}
+                  <button
+                    onClick={() => handleCancel(app._id)}
                     style={styles.cancelBtn}
+                    disabled={actionLoading === app._id}
                   >
                     <X size={20} />
                   </button>
                 </>
               )}
-              {app.status === "Approved" && (
-                <button 
-                  onClick={() => updateStatus(app.id, "Pending")}
-                  style={styles.rescheduleBtn}
-                >
-                  Reschedule
-                </button>
+              {app.status === "approved" && (
+                <span style={{ fontSize: "12px", color: "#16a34a", fontWeight: "bold" }}>✓ Approved</span>
               )}
-              {app.status === "Cancelled" && (
-                <span style={{fontSize: '12px', color: '#dc2626', fontWeight: 'bold'}}>Rejected</span>
+              {app.status === "cancelled" && (
+                <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "bold" }}>Rejected</span>
+              )}
+              {app.status === "completed" && (
+                <span style={{ fontSize: "12px", color: "#2563eb", fontWeight: "bold" }}>Completed</span>
               )}
             </div>
           </div>
@@ -91,9 +175,10 @@ const AppointmentManagement = () => {
 // Helper for status colors
 const getStatusStyle = (status) => {
   switch (status) {
-    case "Pending": return { backgroundColor: "#fff7ed", color: "#c2410c" };
-    case "Approved": return { backgroundColor: "#f0fdf4", color: "#16a34a" };
-    case "Cancelled": return { backgroundColor: "#fef2f2", color: "#dc2626" };
+    case "pending": return { backgroundColor: "#fff7ed", color: "#c2410c" };
+    case "approved": return { backgroundColor: "#f0fdf4", color: "#16a34a" };
+    case "cancelled": return { backgroundColor: "#fef2f2", color: "#dc2626" };
+    case "completed": return { backgroundColor: "#eff6ff", color: "#2563eb" };
     default: return {};
   }
 };
@@ -101,8 +186,8 @@ const getStatusStyle = (status) => {
 const styles = {
   container: { marginTop: "10px", width: "100%" },
   header: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" },
-  title: { margin: 0, fontSize: "18px", color: "#374151", fontWeight: '600' },
-  countBadge: { backgroundColor: "#16a34a", color: "#fff", padding: "2px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 'bold' },
+  title: { margin: 0, fontSize: "18px", color: "#374151", fontWeight: "600" },
+  countBadge: { backgroundColor: "#16a34a", color: "#fff", padding: "2px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: "bold" },
   list: { display: "flex", flexDirection: "column", gap: "15px" },
   appointmentCard: {
     display: "flex",
@@ -112,56 +197,46 @@ const styles = {
     border: "1px solid #f3f4f6",
     borderRadius: "12px",
     backgroundColor: "#fff",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+    boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
   },
   cardInfo: { flex: "1" },
   patientRow: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" },
-  avatar: { width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af", border: "1px solid #e5e7eb" },
+  avatar: { width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#eef2ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5", fontWeight: "bold", fontSize: "15px", border: "1px solid #e5e7eb" },
   patientName: { fontWeight: "700", color: "#111827", fontSize: "15px" },
-  statusBadge: { padding: "3px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", textTransform: 'uppercase' },
-  dateTimeRow: { display: "flex", gap: "20px", color: "#6b7280", fontSize: "13px" },
+  statusBadge: { padding: "3px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: "700", textTransform: "uppercase" },
+  dateTimeRow: { display: "flex", gap: "20px", color: "#6b7280", fontSize: "13px", flexWrap: "wrap" },
   infoItem: { display: "flex", alignItems: "center", gap: "6px" },
   icon: { color: "#9ca3af" },
-  actionButtons: { display: "flex", alignItems: "center", gap: "10px" },
-  approveBtn: { 
-    display: "flex", 
-    alignItems: "center", 
-    gap: "8px", 
-    backgroundColor: "#16a34a", 
-    color: "#fff", 
-    border: "none", 
-    padding: "0 20px", 
-    height: "42px", 
-    borderRadius: "8px", 
-    cursor: "pointer", 
+  notes: { fontSize: "13px", color: "#6b7280", marginTop: "8px", marginBottom: 0 },
+  actionButtons: { display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 },
+  approveBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    backgroundColor: "#16a34a",
+    color: "#fff",
+    border: "none",
+    padding: "0 20px",
+    height: "42px",
+    borderRadius: "8px",
+    cursor: "pointer",
     fontWeight: "600",
     fontSize: "14px",
-    transition: "0.2s"
+    transition: "0.2s",
   },
-  cancelBtn: { 
-  display: "flex", 
-  alignItems: "center", 
-  justifyContent: "center", 
-  backgroundColor: "#fef2f2", // Light red background makes the red icon pop
-  color: "#dc2626", 
-  border: "1px solid #fecaca", // Softer border
-  width: "42px", 
-  height: "42px", 
-  borderRadius: "8px", 
-  cursor: "pointer",
-  transition: "0.2s",
-  padding: 0, // Ensure no default padding is pushing the icon out
-},
-  rescheduleBtn: { 
-    backgroundColor: "#f3f4f6", 
-    color: "#4b5563", 
-    border: "none", 
-    padding: "0 18px", 
-    height: "40px", 
-    borderRadius: "8px", 
-    cursor: "pointer", 
-    fontSize: "13px",
-    fontWeight: "500" 
+  cancelBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fef2f2",
+    color: "#dc2626",
+    border: "1px solid #fecaca",
+    width: "42px",
+    height: "42px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "0.2s",
+    padding: 0,
   },
 };
 

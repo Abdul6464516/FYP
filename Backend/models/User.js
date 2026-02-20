@@ -14,11 +14,15 @@ const userSchema = new Schema({
   phone: { type: String },
   medicalHistory: { type: String },
 
+  // Common optional field
+  city: { type: String },
+
   // Doctor-specific fields
   specialty: { type: String },
   qualifications: { type: String },
   yearsOfExperience: { type: Number },
   availability: { type: String },
+  chargesPerSession: { type: Number },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

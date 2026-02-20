@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authActions";
 import { toast } from "react-toastify";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, DollarSign } from "lucide-react";
+import { useUser } from "../../context/UserContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { loginUserContext } = useUser();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,18 +24,23 @@ const SignUp = () => {
     gender: "",
     phone: "",
     medicalHistory: "",
+    city: "",
     // doctor fields
     specialty: "",
     qualifications: "",
     yearsOfExperience: "",
     availability: "",
+    chargesPerSession: "",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    // Reset gender when role changes so dropdown resets properly
+    if (name === 'role') {
+      setFormData({ ...formData, role: value, gender: '' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSignup = async (e) => {
@@ -56,44 +63,40 @@ const SignUp = () => {
         payload.gender = formData.gender;
         payload.phone = formData.phone;
         payload.medicalHistory = formData.medicalHistory;
+        payload.city = formData.city;
       }
 
       if (formData.role === 'doctor') {
+        payload.gender = formData.gender;
+        payload.phone = formData.phone;
         payload.specialty = formData.specialty;
         payload.qualifications = formData.qualifications;
         payload.yearsOfExperience = formData.yearsOfExperience;
         payload.availability = formData.availability;
+        payload.chargesPerSession = formData.chargesPerSession;
+        payload.city = formData.city;
       }
 
       const data = await registerUser(payload);
 
-      // Save data to localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userName', data.user.fullName);
-      localStorage.setItem('userEmail', data.user.email);
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('isLoggedIn', 'true');
-
-      if (formData.role === 'patient') {
-        localStorage.setItem('patient_age', formData.age);
-        localStorage.setItem('patient_gender', formData.gender);
-        localStorage.setItem('patient_phone', formData.phone);
-        localStorage.setItem('patient_medicalHistory', formData.medicalHistory);
-      }
-
-      if (formData.role === 'doctor') {
-        localStorage.setItem('doctor_specialty', formData.specialty);
-        localStorage.setItem('doctor_qualifications', formData.qualifications);
-        localStorage.setItem('doctor_yearsOfExperience', formData.yearsOfExperience);
-        localStorage.setItem('doctor_availability', formData.availability);
-      }
+      // Store user data in context (replaces all localStorage calls)
+      loginUserContext(data.token, data.user);
 
       // Show success toast and navigate after a short delay
       toast.success(`${formData.username} has created account`);
 
+      // Redirect to appropriate dashboard based on role
       setTimeout(() => {
-        navigate('/');
-      }, 3000);
+        if (data.user.role === 'patient') {
+          navigate('/patient');
+        } else if (data.user.role === 'doctor') {
+          navigate('/doctor');
+        } else if (data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      }, 1000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -233,18 +236,54 @@ const SignUp = () => {
                 />
               </div>
             </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>City</label>
+              <input
+                type="text"
+                name="city"
+                placeholder="e.g. Lahore"
+                value={formData.city}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
           </>
         )}
 
         {formData.role === 'doctor' && (
           <>
+            <div style={styles.row}>
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Specialty</label>
+                <input
+                  type="text"
+                  name="specialty"
+                  placeholder="e.g. Cardiology"
+                  value={formData.specialty}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Gender</label>
+                <select name="gender" value={formData.gender} onChange={handleChange} style={styles.input}>
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Specialty</label>
+              <label style={styles.label}>Contact Number</label>
               <input
-                type="text"
-                name="specialty"
-                placeholder="e.g. Cardiology"
-                value={formData.specialty}
+                type="tel"
+                name="phone"
+                placeholder="e.g. +1234567890"
+                value={formData.phone}
                 onChange={handleChange}
                 style={styles.input}
               />
@@ -274,13 +313,39 @@ const SignUp = () => {
               />
             </div>
 
+            <div style={styles.row}>
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Availability (brief)</label>
+                <input
+                  type="text"
+                  name="availability"
+                  placeholder="e.g. Mon-Fri 9:00-14:00"
+                  value={formData.availability}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={{ ...styles.inputGroup, ...styles.half }}>
+                <label style={styles.label}>Charges Per Session <DollarSign size={16} style={{ display: 'inline', verticalAlign: 'middle' }} /></label>
+                <input
+                  type="number"
+                  name="chargesPerSession"
+                  placeholder="e.g. $2000"
+                  value={formData.chargesPerSession}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+            </div>
+
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Availability (brief)</label>
+              <label style={styles.label}>City</label>
               <input
                 type="text"
-                name="availability"
-                placeholder="e.g. Mon-Fri 9:00-14:00"
-                value={formData.availability}
+                name="city"
+                placeholder="e.g. Karachi"
+                value={formData.city}
                 onChange={handleChange}
                 style={styles.input}
               />
@@ -403,7 +468,7 @@ const styles = {
   loginBtn: {
     width: "100%",
     padding: "12px",
-    background: "linear-gradient(90deg,#3b82f6,#007bff)",
+    background: "linear-gradient(90deg,#4caf50,#28a745)",
     color: "#fff",
     border: "none",
     borderRadius: "8px",

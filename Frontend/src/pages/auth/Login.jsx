@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authActions";
 import { toast } from "react-toastify";
+import { useUser } from "../../context/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { loginUserContext } = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -39,12 +41,8 @@ const Login = () => {
         return;
       }
 
-      // Save the session data to localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userEmail', data.user.email);
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('userName', data.user.fullName);
-      localStorage.setItem('isLoggedIn', 'true');
+      // Store user data in context (replaces all localStorage calls)
+      loginUserContext(data.token, data.user);
 
       console.log('Login successful for:', data.user.fullName);
 
@@ -184,7 +182,7 @@ const styles = {
   loginBtn: {
     width: "100%",
     padding: "14px",
-    backgroundColor: "#007bff",
+    backgroundColor: "#28a745",
     color: "#fff",
     border: "none",
     borderRadius: "8px",

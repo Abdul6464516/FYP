@@ -1,0 +1,172 @@
+const User = require('../models/User');
+const Feedback = require('../models/Feedback');
+const Appointment = require('../models/Appointment');
+
+// POST /api/patient/appointment — book an appointment
+async function bookAppointment(req, res) {
+  try {
+    const { doctor, date, time, type, reason, notes } = req.body;
+
+    if (!doctor || !date || !time) {
+      return res.status(400).json({ message: 'Doctor, date and time are required' });
+    }
+
+    // Verify the doctor exists
+    const doctorUser = await User.findOne({ _id: doctor, role: 'doctor' });
+    if (!doctorUser) return res.status(404).json({ message: 'Doctor not found' });
+
+    // Prevent duplicate booking for same patient + doctor + date + time
+    const existing = await Appointment.findOne({
+      patient: req.user.id,
+      doctor,
+      date,
+      time,
+      status: { $in: ['pending', 'approved'] },
+    });
+    if (existing) {
+      return res.status(409).json({ message: 'You already have a booking with this doctor at this slot' });
+    }
+
+    const appointment = new Appointment({
+      patient: req.user.id,
+      doctor,
+      date,
+      time,
+      type: type || 'online',
+      reason: reason || '',
+      notes: notes || '',
+      fee: doctorUser.chargesPerSession || 0,
+    });
+
+    await appointment.save();
+
+    const populated = await Appointment.findById(appointment._id)
+      .populate('doctor', 'fullName specialty city chargesPerSession')
+      .populate('patient', 'fullName email phone');
+
+    res.status(201).json({ message: 'Appointment booked successfully', appointment: populated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// GET /api/patient/appointments — get all appointments of the logged-in patient
+async function getMyAppointments(req, res) {
+  try {
+    const appointments = await Appointment.find({ patient: req.user.id })
+      .populate('doctor', 'fullName specialty city chargesPerSession')
+      .sort({ createdAt: -1 });
+
+    res.json({ appointments });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// PUT /api/patient/appointment/:id/cancel — patient cancels own appointment
+async function cancelAppointment(req, res) {
+  try {
+    const appointment = await Appointment.findOne({ _id: req.params.id, patient: req.user.id });
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+
+    if (appointment.status === 'cancelled') {
+      return res.status(400).json({ message: 'Appointment is already cancelled' });
+    }
+    if (appointment.status === 'completed') {
+      return res.status(400).json({ message: 'Cannot cancel a completed appointment' });
+    }
+
+    appointment.status = 'cancelled';
+    await appointment.save();
+
+    res.json({ message: 'Appointment cancelled', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// GET /api/patient/profile — fetch logged-in patient's profile
+async function getProfile(req, res) {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// PUT /api/patient/profile — update logged-in patient's profile
+async function updateProfile(req, res) {
+  try {
+    const { fullName, age, gender, phone, medicalHistory } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { fullName, age, gender, phone, medicalHistory },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ message: 'Profile updated successfully', user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// POST /api/patient/feedback — submit a feedback/review for a doctor
+async function submitFeedback(req, res) {
+  try {
+    const { rating, message, reviewOn } = req.body;
+
+    if (!rating || !reviewOn) {
+      return res.status(400).json({ message: 'Rating and doctor are required' });
+    }
+
+    // Verify the doctor exists
+    const doctor = await User.findOne({ _id: reviewOn, role: 'doctor' });
+    if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+    const feedback = new Feedback({
+      rating,
+      totalRating: 5,
+      message: message || '',
+      reviewBy: req.user.id,
+      reviewOn,
+    });
+
+    await feedback.save();
+
+    // Populate the saved feedback before returning
+    const populated = await Feedback.findById(feedback._id)
+      .populate('reviewBy', 'fullName')
+      .populate('reviewOn', 'fullName specialty');
+
+    res.status(201).json({ message: 'Feedback submitted successfully', feedback: populated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// GET /api/patient/feedback — get all feedback submitted by the logged-in patient
+async function getMyFeedbacks(req, res) {
+  try {
+    const feedbacks = await Feedback.find({ reviewBy: req.user.id })
+      .populate('reviewOn', 'fullName specialty')
+      .sort({ createdAt: -1 });
+
+    res.json({ feedbacks });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+module.exports = { getProfile, updateProfile, submitFeedback, getMyFeedbacks, bookAppointment, getMyAppointments, cancelAppointment };
