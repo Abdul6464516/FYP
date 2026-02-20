@@ -12,7 +12,10 @@ import {
   X,
   Search,
 } from "lucide-react";
+import { toast } from "react-toastify";
+import { clearSession } from "../../services/auth";
 import { useUser } from "../../context/UserContext";
+import { connectSocket, disconnectSocket } from "../../services/socket";
 
 // --- COMPONENT IMPORTS ---
 import PatientProfile from "../../Components/Patient/PatientProfile";
@@ -25,16 +28,43 @@ import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
-  const { user, logoutUser } = useUser();
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
+  const [incomingCallData, setIncomingCallData] = useState(null);
 
-  const userName = user?.fullName || "";
-  const userRole = user?.role || "Patient";
+  useEffect(() => {
+    const savedName = localStorage.getItem("userName");
+    const savedRole = localStorage.getItem("userRole") || "Patient";
+
+    if (savedName) setUserName(savedName);
+    setUserRole(savedRole);
+  }, []);
+
+  // ─── Connect socket as soon as dashboard loads ───────────────
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const socket = connectSocket(user._id);
+
+    const handleIncomingCall = (data) => {
+      console.log("Dashboard: incoming-call received", data);
+      setIncomingCallData(data);
+      setActiveTab("Consultation"); // auto-switch to Video Call tab
+    };
+
+    socket.on("incoming-call", handleIncomingCall);
+
+    return () => {
+      socket.off("incoming-call", handleIncomingCall);
+    };
+  }, [user]);
 
   const handleLogout = () => {
-    logoutUser();
-    sessionStorage.clear();
+    // clear only auth/session keys and redirect
+    clearSession();
     navigate('/');
   };
 
@@ -118,7 +148,12 @@ const PatientDashboard = () => {
             {activeTab === "Profile" && <PatientProfile />}
             {activeTab === "Appointments" && <AppointmentBooking />}{" "}
             {/* 3. Added Search Rendering */}
-            {activeTab === "Consultation" && <VideoCall />}
+            {activeTab === "Consultation" && (
+              <VideoCall
+                incomingCallData={incomingCallData}
+                onCallHandled={() => setIncomingCallData(null)}
+              />
+            )}
             {activeTab === "Prescriptions" && <PrescriptionAccess />}
             {activeTab === "Records" && <MedicalRecords />}
             {activeTab === "Feedback" && <FeedbackSystem />}
