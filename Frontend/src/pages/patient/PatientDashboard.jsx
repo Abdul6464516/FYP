@@ -12,22 +12,28 @@ import {
   X,
   Search,
 } from "lucide-react";
+import { toast } from "react-toastify";
+import { clearSession } from "../../services/auth";
+import { useUser } from "../../context/UserContext";
+import { connectSocket, disconnectSocket } from "../../services/socket";
 
 // --- COMPONENT IMPORTS ---
 import PatientProfile from "../../Components/Patient/PatientProfile";
 import VideoCall from "../../Components/Patient/VideoCall";
-import AppointmentBooking from "../../Components/Patient/AppointmentBooking";
+import AppointmentBooking from "../../Components/Patient/AppointmentBooking"; 
 import PrescriptionAccess from "../../Components/Patient/PerscriptionAccess";
 import MedicalRecords from "../../Components/Patient/MedicalRecords";
 import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
-import DoctorSearch from "../../Components/Patient/DoctorSearch"; // 1. Added DoctorSearch Import
+
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [incomingCallData, setIncomingCallData] = useState(null);
 
   useEffect(() => {
     const savedName = localStorage.getItem("userName");
@@ -37,19 +43,35 @@ const PatientDashboard = () => {
     setUserRole(savedRole);
   }, []);
 
+  // ─── Connect socket as soon as dashboard loads ───────────────
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const socket = connectSocket(user._id);
+
+    const handleIncomingCall = (data) => {
+      console.log("Dashboard: incoming-call received", data);
+      setIncomingCallData(data);
+      setActiveTab("Consultation"); // auto-switch to Video Call tab
+    };
+
+    socket.on("incoming-call", handleIncomingCall);
+
+    return () => {
+      socket.off("incoming-call", handleIncomingCall);
+    };
+  }, [user]);
+
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    // clear only auth/session keys and redirect
+    clearSession();
+    navigate('/');
   };
 
   const menuItems = [
     { id: "Profile", icon: <User size={20} />, label: "Profile" },
-    { id: "Search", icon: <Search size={20} />, label: "Find a Doctor" }, // 2. Added Search to Menu
-    {
-      id: "Appointments",
-      icon: <Calendar size={20} />,
-      label: "Book Appointment",
-    },
+    { id: "Appointments", icon: <Calendar size={20} />, label: "Book Appointment" }, // 2. Added Search to Menu
+  
     { id: "Consultation", icon: <Video size={20} />, label: "Video Call" },
     {
       id: "Prescriptions",
@@ -124,10 +146,14 @@ const PatientDashboard = () => {
         <main style={styles.contentBody}>
           <div style={styles.card}>
             {activeTab === "Profile" && <PatientProfile />}
-            {activeTab === "Search" && <DoctorSearch />}{" "}
+            {activeTab === "Appointments" && <AppointmentBooking />}{" "}
             {/* 3. Added Search Rendering */}
-            {activeTab === "Appointments" && <AppointmentBooking />}
-            {activeTab === "Consultation" && <VideoCall />}
+            {activeTab === "Consultation" && (
+              <VideoCall
+                incomingCallData={incomingCallData}
+                onCallHandled={() => setIncomingCallData(null)}
+              />
+            )}
             {activeTab === "Prescriptions" && <PrescriptionAccess />}
             {activeTab === "Records" && <MedicalRecords />}
             {activeTab === "Feedback" && <FeedbackSystem />}

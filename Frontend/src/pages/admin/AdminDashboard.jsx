@@ -11,6 +11,7 @@ import {
   X,
   UserCog,
 } from "lucide-react";
+import { clearSession } from "../../services/auth";
 
 // --- COMPONENT IMPORTS ---
 import AdminProfile from "../../Components/Admin/AdminProfile";
@@ -42,8 +43,8 @@ const AdminDashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    clearSession();
+    navigate('/');
   };
 
   const menuItems = [

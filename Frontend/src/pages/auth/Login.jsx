@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/authActions";
+import { toast } from "react-toastify";
+import { useUser } from "../../context/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { loginUserContext } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
     role: "patient",
   });
@@ -17,29 +23,46 @@ const Login = () => {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    // 1. Logic to extract a display name from the email 
-    // (e.g., "raziq@example.com" becomes "Raziq")
-    const extractedName = formData.email.split("@")[0];
-    const displayName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
+    try {
+      const data = await loginUser({
+        identifier: formData.identifier,
+        password: formData.password,
+      });
 
-    // 2. Save the session data to the browser's Local Storage
-    localStorage.setItem("userEmail", formData.email);
-    localStorage.setItem("userRole", formData.role);
-    localStorage.setItem("userName", displayName);
-    localStorage.setItem("isLoggedIn", "true");
+      // Verify selected role matches backend role
+      if (data.user.role !== formData.role) {
+        setError(`You are registered as a ${data.user.role}, not a ${formData.role}. Please select the correct role.`);
+        setLoading(false);
+        return;
+      }
 
-    console.log("Login successful for:", displayName);
+      // Store user data in context (replaces all localStorage calls)
+      loginUserContext(data.token, data.user);
 
-    // 3. Navigate to the specific dashboard based on the selected role
-    if (formData.role === "patient") {
-      navigate("/patient");
-    } else if (formData.role === "doctor") {
-      navigate("/doctor");
-    } else if (formData.role === "admin") {
-      navigate("/admin");
+      console.log('Login successful for:', data.user.fullName);
+
+      // Show success toast
+      toast.success(`Welcome back, ${data.user.fullName}!`);
+
+      // Navigate based on selected role after a short delay
+      setTimeout(() => {
+        if (formData.role === 'patient') {
+          navigate('/patient');
+        } else if (formData.role === 'doctor') {
+          navigate('/doctor');
+        } else if (formData.role === 'admin') {
+          navigate('/admin');
+        }
+      }, 1000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,13 +75,15 @@ const Login = () => {
       <form style={styles.form} onSubmit={handleLogin}>
         <h2 style={styles.title}>Login</h2>
 
+        {error && <div style={styles.error}>{error}</div>}
+
         <div style={styles.inputGroup}>
-          <label style={styles.label}>Email Address</label>
+          <label style={styles.label}>Email or Username</label>
           <input
-            type="email"
-            name="email"
-            placeholder="example@mail.com"
-            value={formData.email}
+            type="text"
+            name="identifier"
+            placeholder="Email or username"
+            value={formData.identifier}
             onChange={handleChange}
             required
             style={styles.input}
@@ -92,8 +117,8 @@ const Login = () => {
           </select>
         </div>
 
-        <button type="submit" style={styles.loginBtn}>
-          Sign In
+        <button type="submit" style={styles.loginBtn} disabled={loading}>
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
 
         <div style={styles.divider}>
@@ -157,7 +182,7 @@ const styles = {
   loginBtn: {
     width: "100%",
     padding: "14px",
-    backgroundColor: "#007bff",
+    backgroundColor: "#28a745",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
@@ -189,6 +214,14 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.3s",
+  },
+  error: {
+    backgroundColor: '#fee2e2',
+    color: '#dc2626',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    marginBottom: '15px',
+    fontSize: '14px',
   },
 };
 

@@ -13,6 +13,9 @@ import {
   FileText,
   Bell,
 } from "lucide-react";
+import { clearSession } from "../../services/auth";
+import { useUser } from "../../context/UserContext";
+import { getDoctorAppointments } from "../../services/doctorAction";
 
 // --- COMPONENT IMPORTS ---
 import DoctorProfile from "../../Components/Doctor/DoctorProfile";
@@ -26,11 +29,14 @@ import DoctorSettings from "../../Components/Doctor/DoctorSettings";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
+  const { user, logoutUser } = useUser();
+  const drName = user?.fullName || "Specialist";
+
   const [activeTab, setActiveTab] = useState("Profile");
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [drName, setDrName] = useState("");
-  const [unreadNotifications, setUnreadNotifications] = useState(2); // Mock count
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [readIds, setReadIds] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,15 +47,29 @@ const DoctorDashboard = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    const savedName = localStorage.getItem("userName") || "Specialist";
-    setDrName(savedName);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fetch appointment count for notifications
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const data = await getDoctorAppointments();
+        const unread = data.appointments.filter(
+          (a) => a.status === "pending" && !readIds.includes(a._id)
+        ).length;
+        setUnreadNotifications(unread);
+      } catch {}
+    };
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000); // poll every 30s
+    return () => clearInterval(interval);
+  }, [readIds]);
+
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    clearSession();
+    logoutUser();
+    navigate('/');
   };
 
   const menuItems = [
@@ -167,7 +187,12 @@ const DoctorDashboard = () => {
             {activeTab === "Prescription" && <PrescriptionGeneration />}
             {activeTab === "Reports" && <MedicalReports />}
             {activeTab === "Settings" && <DoctorSettings />}
-            {activeTab === "Notifications" && <NotificationCenter />}
+            {activeTab === "Notifications" && (
+              <NotificationCenter
+                readIds={readIds}
+                onMarkRead={(ids) => setReadIds((prev) => [...new Set([...prev, ...ids])])}
+              />
+            )}
           </div>
         </main>
       </div>
