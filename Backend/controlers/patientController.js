@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Feedback = require('../models/Feedback');
 const Appointment = require('../models/Appointment');
 const Prescription = require('../models/Prescription');
+const Notification = require('../models/Notification');
 
 // POST /api/patient/appointment — book an appointment
 async function bookAppointment(req, res) {
@@ -40,6 +41,18 @@ async function bookAppointment(req, res) {
     });
 
     await appointment.save();
+
+    // Auto-create notification for the doctor
+    const patientUser = await User.findById(req.user.id);
+    const patientName = patientUser?.fullName || 'A patient';
+    await Notification.create({
+      recipient: doctor,
+      type: 'booking',
+      title: 'New Appointment Request',
+      message: `${patientName} has requested an appointment on ${date} at ${time}`,
+      relatedAppointment: appointment._id,
+      relatedUser: req.user.id,
+    });
 
     const populated = await Appointment.findById(appointment._id)
       .populate('doctor', 'fullName specialty city chargesPerSession')

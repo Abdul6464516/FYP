@@ -30,7 +30,7 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 
   // Not authenticated → go to login
   if (!isLoggedIn || !user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Authenticated but wrong role → redirect to their own dashboard

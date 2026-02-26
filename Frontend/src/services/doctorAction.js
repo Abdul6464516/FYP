@@ -17,6 +17,17 @@ export async function fetchDoctors({ search, specialty, availability, city } = {
   }
 }
 
+// Fetch aggregated average ratings for all doctors
+export async function fetchDoctorRatings() {
+  try {
+    const res = await api.get('/doctor/ratings');
+    return res.data; // { ratings: { doctorId: { avgRating, totalReviews } } }
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch ratings';
+    throw new Error(msg);
+  }
+}
+
 // Fetch logged-in doctor's own profile
 export async function getDoctorProfile() {
   try {
@@ -123,6 +134,52 @@ export async function getPatientHistory(patientId) {
     return res.data;
   } catch (err) {
     const msg = err?.response?.data?.message || err.message || 'Failed to fetch patient history';
+    throw new Error(msg);
+  }
+}
+
+// ─── Notification APIs ────────────────────────────────────────
+
+// Fetch all notifications for the logged-in doctor
+export async function getNotifications() {
+  try {
+    const res = await api.get('/doctor/notifications');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch notifications';
+    throw new Error(msg);
+  }
+}
+
+// Fetch unread notification count
+export async function getUnreadCount() {
+  try {
+    const res = await api.get('/doctor/notifications/unread-count');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to fetch unread count';
+    throw new Error(msg);
+  }
+}
+
+// Mark a single notification as read
+export async function markNotificationRead(notificationId) {
+  try {
+    const res = await api.put(`/doctor/notifications/${notificationId}/read`);
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to mark notification';
+    throw new Error(msg);
+  }
+}
+
+// Mark all notifications as read
+export async function markAllNotificationsRead() {
+  try {
+    const res = await api.put('/doctor/notifications/read-all');
+    return res.data;
+  } catch (err) {
+    const msg = err?.response?.data?.message || err.message || 'Failed to mark all notifications';
     throw new Error(msg);
   }
 }

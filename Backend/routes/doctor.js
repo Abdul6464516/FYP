@@ -4,11 +4,13 @@ const {
   getAllDoctors, getDoctorProfile, updateDoctorProfile,
   getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
   getCompletedPatients, getPatientHistory, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+  getDoctorRatings,
 } = require('../controlers/doctorController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
 // Public route — any logged-in user can search doctors
 router.get('/list', verifyToken, getAllDoctors);
+router.get('/ratings', verifyToken, getDoctorRatings);
 
 // Doctor-only routes
 router.get('/profile', verifyToken, requireRole('doctor'), getDoctorProfile);

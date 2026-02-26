@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const Prescription = require('../models/Prescription');
 const Consultation = require('../models/Consultation');
+const Feedback = require('../models/Feedback');
+const Notification = require('../models/Notification');
 
 // GET /api/doctor/appointments — fetch all appointments for the logged-in doctor
 async function getDoctorAppointments(req, res) {
@@ -350,8 +352,29 @@ async function getPatientHistory(req, res) {
   }
 }
 
+// GET /api/doctor/ratings — aggregated average ratings for all doctors
+async function getDoctorRatings(req, res) {
+  try {
+    const ratings = await Feedback.aggregate([
+      { $group: { _id: '$reviewOn', avgRating: { $avg: '$rating' }, totalReviews: { $sum: 1 } } },
+    ]);
+    const ratingsMap = {};
+    ratings.forEach((r) => {
+      ratingsMap[r._id.toString()] = {
+        avgRating: Math.round(r.avgRating * 10) / 10,
+        totalReviews: r.totalReviews,
+      };
+    });
+    res.json({ ratings: ratingsMap });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 module.exports = {
   getAllDoctors, getDoctorProfile, updateDoctorProfile,
   getDoctorAppointments, approveAppointment, cancelAppointmentByDoctor,
   getCompletedPatients, getPatientHistory, createPrescription, getDoctorPrescriptions, getPrescriptionById,
+  getDoctorRatings,
 };
