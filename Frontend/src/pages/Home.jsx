@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import {
   Heart, Shield, Clock, Video, Users, Star, ChevronRight,
   Stethoscope, Activity, CalendarCheck, Pill, Phone, ArrowRight,
-  CheckCircle, MessageCircle, Award, Zap
+  CheckCircle, MessageCircle, Award, Zap, Menu, X
 } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const featureCount = 6;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -17,13 +19,21 @@ const Home = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 768) setMenuOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   // Auto-rotate features
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
+      setActiveFeature((prev) => (prev + 1) % featureCount);
     }, 3500);
     return () => clearInterval(interval);
-  }, []);
+  }, [featureCount]);
 
   const features = [
     { icon: <Video size={28} />, title: "Video Consultations", desc: "Connect with doctors from the comfort of your home via secure HD video calls.", color: "#2563eb", bg: "#eff6ff" },
@@ -58,21 +68,35 @@ const Home = () => {
     <div style={styles.page}>
       {/* ───── NAVBAR ───── */}
       <nav style={{ ...styles.navbar, ...(scrolled ? styles.navbarScrolled : {}) }}>
-        <div style={styles.navInner}>
+        <div style={styles.navInner} className="nav-inner">
           <div style={styles.logo} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <div style={styles.logoIcon}><Heart size={20} color="#fff" fill="#fff" /></div>
-            <span style={styles.logoText}>Telemedicine</span>
+            <span style={styles.logoText} className="logo-text">Telemedicine</span>
           </div>
-          <div style={styles.navLinks}>
-            <a href="#features" style={styles.navLink}>Features</a>
-            <a href="#how-it-works" style={styles.navLink}>How It Works</a>
-            <a href="#testimonials" style={styles.navLink}>Testimonials</a>
-          </div>
-          <div style={styles.navBtns}>
-            <button style={styles.navSignIn} onClick={() => navigate("/login")}>Sign In</button>
-            <button style={styles.navSignUp} onClick={() => navigate("/signup")}>
-              Sign Up <ArrowRight size={15} />
-            </button>
+
+          <button
+            type="button"
+            style={styles.hamburgerBtn}
+            className="hamburger-btn"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          <div style={styles.navMenu} className={`nav-menu ${menuOpen ? "open" : ""}`}>
+            <div style={styles.navLinks} className="nav-links">
+              <a href="#features" style={styles.navLink} className="nav-link" onClick={() => setMenuOpen(false)}>Features</a>
+              <a href="#how-it-works" style={styles.navLink} className="nav-link" onClick={() => setMenuOpen(false)}>How It Works</a>
+              <a href="#testimonials" style={styles.navLink} className="nav-link" onClick={() => setMenuOpen(false)}>Testimonials</a>
+            </div>
+            <div style={styles.navBtns} className="nav-btns">
+              <button style={styles.navSignIn} className="nav-sign-in" onClick={() => { setMenuOpen(false); navigate("/login"); }}>Sign In</button>
+              <button style={styles.navSignUp} className="nav-sign-up" onClick={() => { setMenuOpen(false); navigate("/signup"); }}>
+                Sign Up <ArrowRight size={15} />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -84,24 +108,24 @@ const Home = () => {
         <div style={styles.blob2} />
         <div style={styles.blob3} />
 
-        <div style={styles.heroInner}>
-          <div style={styles.heroLeft}>
+        <div style={styles.heroInner} className="hero-inner">
+          <div style={styles.heroLeft} className="hero-left">
             <div style={styles.heroBadge}>
               <Zap size={14} color="#16a34a" /> #1 Healthcare Platform
             </div>
-            <h1 style={styles.heroTitle}>
+            <h1 style={styles.heroTitle} className="hero-title">
               Your Health,{" "}
               <span style={styles.heroGradient}>Our Priority</span>
             </h1>
-            <p style={styles.heroSubtitle}>
+            <p style={styles.heroSubtitle} className="hero-subtitle">
               Experience world-class healthcare from anywhere. Connect with top doctors,
               book appointments, get prescriptions — all in one secure platform.
             </p>
-            <div style={styles.heroBtns}>
-              <button style={styles.heroBtn} onClick={() => navigate("/signup")}>
+            <div style={styles.heroBtns} className="hero-btns">
+              <button style={styles.heroBtn} className="hero-btn" onClick={() => navigate("/signup")}>
                 Get Started Free <ArrowRight size={18} />
               </button>
-              <button style={styles.heroOutline} onClick={() => navigate("/login")}>
+              <button style={styles.heroOutline} className="hero-outline" onClick={() => navigate("/login")}>
                 Sign In
               </button>
             </div>
@@ -119,7 +143,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div style={styles.heroRight}>
+          <div style={styles.heroRight} className="hero-right">
             <div style={styles.heroCard}>
               {/* Healthcare illustration card */}
               <div style={styles.heroImgContainer}>
@@ -146,9 +170,9 @@ const Home = () => {
 
       {/* ───── STATS BAR ───── */}
       <section style={styles.statsSection}>
-        <div style={styles.statsInner}>
+        <div style={styles.statsInner} className="stats-inner">
           {stats.map((s, i) => (
-            <div key={i} style={styles.statItem}>
+            <div key={i} style={styles.statItem} className="stat-item">
               <div style={styles.statIcon}>{s.icon}</div>
               <div>
                 <div style={styles.statValue}>{s.value}</div>
@@ -168,7 +192,7 @@ const Home = () => {
             Our comprehensive platform brings together all the tools you need for seamless healthcare management.
           </p>
         </div>
-        <div style={styles.featuresGrid}>
+        <div style={styles.featuresGrid} className="features-grid">
           {features.map((f, i) => (
             <div
               key={i}
@@ -199,7 +223,7 @@ const Home = () => {
             From sign-up to consultation — it only takes a few minutes.
           </p>
         </div>
-        <div style={styles.stepsGrid}>
+        <div style={styles.stepsGrid} className="steps-grid">
           {steps.map((s, i) => (
             <div key={i} style={styles.stepCard}>
               <div style={styles.stepNum}>{s.num}</div>
@@ -221,7 +245,7 @@ const Home = () => {
             Hear what our community has to say about their experience.
           </p>
         </div>
-        <div style={styles.testimonialGrid}>
+        <div style={styles.testimonialGrid} className="testimonial-grid">
           {testimonials.map((t, i) => (
             <div key={i} style={styles.testimonialCard}>
               <div style={styles.testimonialStars}>
@@ -246,17 +270,17 @@ const Home = () => {
 
       {/* ───── CTA ───── */}
       <section style={styles.ctaSection}>
-        <div style={styles.ctaInner}>
+        <div style={styles.ctaInner} className="cta-inner">
           <div style={styles.ctaBlob} />
-          <h2 style={styles.ctaTitle}>Ready to Take Control of Your Health?</h2>
-          <p style={styles.ctaSub}>
+          <h2 style={styles.ctaTitle} className="cta-title">Ready to Take Control of Your Health?</h2>
+          <p style={styles.ctaSub} className="cta-sub">
             Join thousands of patients who trust telemedicine for their healthcare needs. It's free to get started.
           </p>
-          <div style={styles.ctaBtns}>
-            <button style={styles.ctaBtn} onClick={() => navigate("/signup")}>
+          <div style={styles.ctaBtns} className="cta-btns">
+            <button style={styles.ctaBtn} className="cta-btn" onClick={() => navigate("/signup")}>
               Create Free Account <ArrowRight size={18} />
             </button>
-            <button style={styles.ctaOutline} onClick={() => navigate("/login")}>
+            <button style={styles.ctaOutline} className="cta-outline" onClick={() => navigate("/login")}>
               Sign In Instead
             </button>
           </div>
@@ -265,7 +289,7 @@ const Home = () => {
 
       {/* ───── FOOTER ───── */}
       <footer style={styles.footer}>
-        <div style={styles.footerInner}>
+        <div style={styles.footerInner} className="footer-inner">
           <div style={styles.footerBrand}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={styles.logoIcon}><Heart size={18} color="#fff" fill="#fff" /></div>
@@ -296,6 +320,7 @@ const Home = () => {
           <span>© 2026 telemedicine. All rights reserved.</span>
         </div>
       </footer>
+
     </div>
   );
 };
@@ -323,6 +348,7 @@ const styles = {
   navInner: {
     maxWidth: "1200px", margin: "0 auto", padding: "0 24px",
     display: "flex", alignItems: "center", justifyContent: "space-between",
+    position: "relative",
   },
   logo: {
     display: "flex", alignItems: "center", gap: "10px", cursor: "pointer",
@@ -357,6 +383,20 @@ const styles = {
     background: "linear-gradient(135deg, #16a34a, #15803d)",
     color: "#fff", fontSize: "14px", fontWeight: "600",
     cursor: "pointer", transition: "all 0.2s",
+  },
+  navMenu: {
+    display: "flex", alignItems: "center", gap: "16px",
+  },
+  hamburgerBtn: {
+    display: "none",
+    width: "38px", height: "38px",
+    borderRadius: "10px",
+    border: "1px solid #e5e7eb",
+    backgroundColor: "#fff",
+    color: "#374151",
+    alignItems: "center", justifyContent: "center",
+    cursor: "pointer",
+    flexShrink: 0,
   },
 
   /* HERO */
