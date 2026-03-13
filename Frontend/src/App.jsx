@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { UserProvider } from "./context/UserContext";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/SignUP";
+import SignUp from "./pages/auth/SignUp";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -31,7 +31,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/signup" element={<SignUp />} />
 
         <Route path="/patient" element={
           <ProtectedRoute allowedRole="patient">
