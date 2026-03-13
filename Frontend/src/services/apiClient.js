@@ -13,11 +13,7 @@ api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
   } catch (err) {
-<<<<<<< HEAD
-    console.log("error ",err)
-=======
-    console.log("error",err)
->>>>>>> aa52f11851a34ca6a11e92ed6e6a4981dabc374a
+    console.log("error", err);
   }
   return config;
 });
