@@ -97,39 +97,39 @@ const SignUp = () => {
 
   /* ─── Input field helper ─── */
   const renderField = (name, label, icon, type = "text", placeholder = "", required = false) => (
-    <div style={s.fieldGroup}>
-      <label style={s.label}>{label}</label>
+    <div style={s.fieldGroup} className="field-group">
+      <label style={s.label} className="label">{label}</label>
       <div style={{
         ...s.inputWrap,
         borderColor: focusedField === name ? "#16a34a" : "#e5e7eb",
         boxShadow: focusedField === name ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-      }}>
+      }} className="input-wrap">
         {icon}
         <input
           type={type} name={name} placeholder={placeholder}
           value={formData[name]} onChange={handleChange}
           onFocus={() => setFocusedField(name)}
           onBlur={() => setFocusedField("")}
-          required={required} style={s.input}
+          required={required} style={s.input} className="input"
         />
       </div>
     </div>
   );
 
   const renderSelect = (name, label, icon, options) => (
-    <div style={s.fieldGroup}>
-      <label style={s.label}>{label}</label>
+    <div style={s.fieldGroup} className="field-group">
+      <label style={s.label} className="label">{label}</label>
       <div style={{
         ...s.inputWrap,
         borderColor: focusedField === name ? "#16a34a" : "#e5e7eb",
         boxShadow: focusedField === name ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-      }}>
+      }} className="input-wrap">
         {icon}
         <select
           name={name} value={formData[name]} onChange={handleChange}
           onFocus={() => setFocusedField(name)}
           onBlur={() => setFocusedField("")}
-          style={{ ...s.input, cursor: "pointer" }}
+          style={{ ...s.input, cursor: "pointer" }} className="input"
         >
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -138,9 +138,9 @@ const SignUp = () => {
   );
 
   return (
-    <div style={s.page}>
+    <div style={s.page} className="auth-page">
       {/* LEFT PANEL */}
-      <div style={s.left}>
+      <div style={s.left} className="auth-left">
         <div style={s.leftOverlay} />
         <div style={s.leftContent}>
           <div style={s.backBtn} onClick={() => navigate("/")}>
@@ -185,10 +185,10 @@ const SignUp = () => {
       </div>
 
       {/* RIGHT PANEL */}
-      <div style={s.right}>
-        <div style={s.formWrapper}>
+      <div style={s.right} className="auth-right">
+        <div style={s.formWrapper} className="form-wrapper">
           <div style={s.formHeader}>
-            <h2 style={s.formTitle}>{step === 1 ? "Create Account" : `${formData.role === "doctor" ? "Doctor" : formData.role === "admin" ? "Admin" : "Patient"} Details`}</h2>
+            <h2 style={s.formTitle} className="form-title">{step === 1 ? "Create Account" : `${formData.role === "doctor" ? "Doctor" : formData.role === "admin" ? "Admin" : "Patient"} Details`}</h2>
             <p style={s.formSub}>
               {step === 1
                 ? "Fill in your basic information to get started"
@@ -207,7 +207,7 @@ const SignUp = () => {
             {step === 1 && (
               <>
                 {/* Role selector */}
-                <div style={s.roleRow}>
+                <div style={s.roleRow} className="role-row">
                   {roles.map((r) => (
                     <div
                       key={r.value}
@@ -217,6 +217,7 @@ const SignUp = () => {
                         backgroundColor: formData.role === r.value ? "#f0fdf4" : "#fff",
                         boxShadow: formData.role === r.value ? "0 0 0 3px rgba(22,163,74,0.1)" : "none",
                       }}
+                      className="role-card"
                       onClick={() => setFormData({ ...formData, role: r.value, gender: "" })}
                     >
                       <div style={{
@@ -287,31 +288,31 @@ const SignUp = () => {
                 {/* Patient fields */}
                 {formData.role === "patient" && (
                   <>
-                    <div style={s.twoCol}>
+                    <div style={s.twoCol} className="two-col">
                       {renderField("age", "Age", <Calendar size={18} color={focusedField === "age" ? "#16a34a" : "#9ca3af"} />, "number", "e.g. 29")}
                       {renderSelect("gender", "Gender", <User size={18} color={focusedField === "gender" ? "#16a34a" : "#9ca3af"} />, [
                         { value: "", label: "Select" }, { value: "male", label: "Male" },
                         { value: "female", label: "Female" }, { value: "other", label: "Other" },
                       ])}
                     </div>
-                    <div style={s.twoCol}>
+                    <div style={s.twoCol} className="two-col">
                       {renderField("phone", "Phone", <Phone size={18} color={focusedField === "phone" ? "#16a34a" : "#9ca3af"} />, "tel", "+92 300 1234567")}
                       {renderField("city", "City", <MapPin size={18} color={focusedField === "city" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Lahore")}
                     </div>
-                    <div style={s.fieldGroup}>
-                      <label style={s.label}>Medical History (optional)</label>
+                    <div style={s.fieldGroup} className="field-group">
+                      <label style={s.label} className="label">Medical History (optional)</label>
                       <div style={{
                         ...s.inputWrap, alignItems: "flex-start", padding: "12px 14px",
                         borderColor: focusedField === "medicalHistory" ? "#16a34a" : "#e5e7eb",
                         boxShadow: focusedField === "medicalHistory" ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-                      }}>
+                      }} className="input-wrap">
                         <FileText size={18} color={focusedField === "medicalHistory" ? "#16a34a" : "#9ca3af"} style={{ marginTop: "2px" }} />
                         <textarea
                           name="medicalHistory" placeholder="Brief medical history or conditions"
                           value={formData.medicalHistory} onChange={handleChange}
                           onFocus={() => setFocusedField("medicalHistory")}
                           onBlur={() => setFocusedField("")}
-                          style={{ ...s.input, resize: "vertical", minHeight: "70px" }}
+                          style={{ ...s.input, resize: "vertical", minHeight: "70px" }} className="input"
                         />
                       </div>
                     </div>
@@ -321,7 +322,7 @@ const SignUp = () => {
                 {/* Doctor fields */}
                 {formData.role === "doctor" && (
                   <>
-                    <div style={s.twoCol}>
+                    <div style={s.twoCol} className="two-col">
                       {renderField("specialty", "Specialty", <Briefcase size={18} color={focusedField === "specialty" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Cardiology")}
                       {renderSelect("gender", "Gender", <User size={18} color={focusedField === "gender" ? "#16a34a" : "#9ca3af"} />, [
                         { value: "", label: "Select" }, { value: "male", label: "Male" },
@@ -330,11 +331,11 @@ const SignUp = () => {
                     </div>
                     {renderField("phone", "Phone", <Phone size={18} color={focusedField === "phone" ? "#16a34a" : "#9ca3af"} />, "tel", "+92 300 1234567")}
                     {renderField("qualifications", "Qualifications", <GraduationCap size={18} color={focusedField === "qualifications" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. MBBS, MD")}
-                    <div style={s.twoCol}>
+                    <div style={s.twoCol} className="two-col">
                       {renderField("yearsOfExperience", "Experience (years)", <Award size={18} color={focusedField === "yearsOfExperience" ? "#16a34a" : "#9ca3af"} />, "number", "e.g. 5")}
                       {renderField("chargesPerSession", "Session Fee (Rs.)", <DollarSign size={18} color={focusedField === "chargesPerSession" ? "#16a34a" : "#9ca3af"} />, "number", "e.g. 2000")}
                     </div>
-                    <div style={s.twoCol}>
+                    <div style={s.twoCol} className="two-col">
                       {renderField("availability", "Availability", <Clock size={18} color={focusedField === "availability" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Mon-Fri 9-2")}
                       {renderField("city", "City", <MapPin size={18} color={focusedField === "city" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Karachi")}
                     </div>

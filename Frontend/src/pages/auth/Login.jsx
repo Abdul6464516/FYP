@@ -69,9 +69,9 @@ const Login = () => {
   ];
 
   return (
-    <div style={s.page}>
+    <div style={s.page} className="auth-page">
       {/* LEFT PANEL */}
-      <div style={s.left}>
+      <div style={s.left} className="auth-left">
         <div style={s.leftOverlay} />
         <div style={s.leftContent}>
           {/* Back to home */}
@@ -129,7 +129,7 @@ const Login = () => {
       </div>
 
       {/* RIGHT PANEL */}
-      <div style={s.right}>
+      <div style={s.right} className="auth-right">
         <div style={s.formWrapper}>
           <div style={s.formHeader}>
             <h2 style={s.formTitle}>Sign In</h2>
@@ -143,16 +143,16 @@ const Login = () => {
           )}
 
           {/* Role selector cards */}
-          <div style={s.roleRow}>
+          <div style={s.roleRow} className="role-row">
             {roles.map((r) => (
               <div
                 key={r.value}
-                style={{
-                  ...s.roleCard,
+                style={{...s.roleCard,
                   borderColor: formData.role === r.value ? "#16a34a" : "#e5e7eb",
                   backgroundColor: formData.role === r.value ? "#f0fdf4" : "#fff",
                   boxShadow: formData.role === r.value ? "0 0 0 3px rgba(22,163,74,0.1)" : "none",
                 }}
+                className="role-card"
                 onClick={() => setFormData({ ...formData, role: r.value })}
               >
                 <div style={{
