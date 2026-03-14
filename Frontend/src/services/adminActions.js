@@ -136,3 +136,41 @@ export const getAllPatients = async () => {
     throw error.response?.data || { message: 'Failed to fetch all patients' };
   }
 };
+
+
+// ========== SYSTEM MONITORING FUNCTIONS ==========
+
+// Get system monitoring statistics
+export const getSystemMonitoring = async () => {
+  try {
+    const response = await api.get('/admin/monitoring/statistics');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching system monitoring stats:', error);
+    throw error.response?.data || { message: 'Failed to fetch system monitoring statistics' };
+  }
+};
+
+
+// Get recent activity feed
+export const getRecentActivity = async () => {
+  try {
+    const response = await api.get('/admin/monitoring/activity');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    throw error.response?.data || { message: 'Failed to fetch recent activity' };
+  }
+};
+
+
+// Get latest feedback
+export const getLatestFeedback = async (limit = 10) => {
+  try {
+    const response = await api.get(`/admin/monitoring/feedback?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching latest feedback:', error);
+    throw error.response?.data || { message: 'Failed to fetch latest feedback' };
+  }
+};

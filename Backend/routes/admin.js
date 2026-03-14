@@ -13,7 +13,10 @@ const {
   rejectUser,
   getVerifiedUsersByRole,
   getAllDoctors,
-  getAllPatients
+  getAllPatients,
+  getSystemMonitoring,
+  getRecentActivity,
+  getLatestFeedback
 } = require('../controlers/adminController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
@@ -55,5 +58,14 @@ router.get('/verification/all-doctors', verifyToken, requireRole('admin'), getAl
 
 // Get all patients with all verification statuses (requires authentication and admin role)
 router.get('/verification/all-patients', verifyToken, requireRole('admin'), getAllPatients);
+
+// System Monitoring - Get live statistics
+router.get('/monitoring/statistics', verifyToken, requireRole('admin'), getSystemMonitoring);
+
+// System Monitoring - Get recent activity feed
+router.get('/monitoring/activity', verifyToken, requireRole('admin'), getRecentActivity);
+
+// System Monitoring - Get latest feedback
+router.get('/monitoring/feedback', verifyToken, requireRole('admin'), getLatestFeedback);
 
 module.exports = router;
