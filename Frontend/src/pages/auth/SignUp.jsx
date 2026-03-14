@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authActions";
 import { toast } from "react-toastify";
 import { useUser } from "../../context/UserContext";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Heart, User, Mail, Lock, Eye, EyeOff, ArrowRight, Stethoscope,
   Phone, MapPin, Calendar, FileText, Clock, DollarSign, Award,
@@ -10,62 +13,173 @@ import {
   CheckCircle, Briefcase, GraduationCap, Settings
 } from "lucide-react";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const usernameRegex = /^[a-zA-Z0-9._-]{3,30}$/;
+const phoneRegex = /^\d{11}$/;
+const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+const signUpSchema = z
+  .object({
+    fullName: z.string().trim().min(3, "Full name must be at least 3 characters"),
+    username: z
+      .string()
+      .trim()
+      .min(3, "Username must be at least 3 characters")
+      .regex(usernameRegex, "Username can contain letters, numbers, dot, underscore, and dash"),
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required")
+      .regex(emailRegex, "Enter a valid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(strongPasswordRegex, "Password must include uppercase, lowercase, and a number"),
+    role: z.enum(["patient", "doctor", "admin"]),
+
+    age: z.string().optional(),
+    gender: z.string().optional(),
+    phone: z.string().optional(),
+    medicalHistory: z.string().max(500, "Medical history should be under 500 characters").optional().or(z.literal("")),
+    city: z.string().optional(),
+
+    specialty: z.string().optional(),
+    qualifications: z.string().optional(),
+    yearsOfExperience: z.string().optional(),
+    availability: z.string().optional(),
+    chargesPerSession: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const role = data.role;
+
+    if (role === "patient") {
+      const ageNum = Number(data.age);
+      if (!data.age || Number.isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Age must be between 1 and 120", path: ["age"] });
+      }
+      if (!data.gender) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Gender is required", path: ["gender"] });
+      }
+      if (!data.phone || !phoneRegex.test(data.phone)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone number must be exactly 11 digits", path: ["phone"] });
+      }
+      if (!data.city || data.city.trim().length < 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "City is required", path: ["city"] });
+      }
+    }
+
+    if (role === "doctor") {
+      if (!data.specialty || data.specialty.trim().length < 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Specialty is required", path: ["specialty"] });
+      }
+      if (!data.gender) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Gender is required", path: ["gender"] });
+      }
+      if (!data.phone || !phoneRegex.test(data.phone)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone number must be exactly 11 digits", path: ["phone"] });
+      }
+      if (!data.qualifications || data.qualifications.trim().length < 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Qualifications are required", path: ["qualifications"] });
+      }
+
+      const exp = Number(data.yearsOfExperience);
+      if (!data.yearsOfExperience || Number.isNaN(exp) || exp < 0 || exp > 60) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Experience must be between 0 and 60 years", path: ["yearsOfExperience"] });
+      }
+
+      const fee = Number(data.chargesPerSession);
+      if (!data.chargesPerSession || Number.isNaN(fee) || fee <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Session fee must be a positive number", path: ["chargesPerSession"] });
+      }
+
+      if (!data.availability || data.availability.trim().length < 3) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Availability is required", path: ["availability"] });
+      }
+      if (!data.city || data.city.trim().length < 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "City is required", path: ["city"] });
+      }
+    }
+  });
+
 const SignUp = () => {
   const navigate = useNavigate();
   const { loginUserContext } = useUser();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState("");
   const [step, setStep] = useState(1); // Step 1: account, Step 2: role details
 
-  const [formData, setFormData] = useState({
-    fullName: "", username: "", email: "", password: "",
-    role: "patient",
-    age: "", gender: "", phone: "", medicalHistory: "", city: "",
-    specialty: "", qualifications: "", yearsOfExperience: "",
-    availability: "", chargesPerSession: "",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    trigger,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signUpSchema),
+    mode: "onChange",
+    defaultValues: {
+      fullName: "",
+      username: "",
+      email: "",
+      password: "",
+      role: "patient",
+      age: "",
+      gender: "",
+      phone: "",
+      medicalHistory: "",
+      city: "",
+      specialty: "",
+      qualifications: "",
+      yearsOfExperience: "",
+      availability: "",
+      chargesPerSession: "",
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "role") {
-      setFormData({ ...formData, role: value, gender: "" });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  const formData = watch();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setError("");
+  const handleSignup = async (values) => {
+    setServerError("");
     setLoading(true);
 
     try {
       const payload = {
-        fullName: formData.fullName, username: formData.username,
-        email: formData.email, password: formData.password, role: formData.role,
+        fullName: values.fullName.trim(),
+        username: values.username.trim(),
+        email: values.email.trim(),
+        password: values.password,
+        role: values.role,
       };
 
-      if (formData.role === "patient") {
+      if (values.role === "patient") {
         Object.assign(payload, {
-          age: formData.age, gender: formData.gender, phone: formData.phone,
-          medicalHistory: formData.medicalHistory, city: formData.city,
+          age: values.age,
+          gender: values.gender,
+          phone: values.phone,
+          medicalHistory: values.medicalHistory,
+          city: values.city,
         });
       }
-      if (formData.role === "doctor") {
+      if (values.role === "doctor") {
         Object.assign(payload, {
-          gender: formData.gender, phone: formData.phone, specialty: formData.specialty,
-          qualifications: formData.qualifications, yearsOfExperience: formData.yearsOfExperience,
-          availability: formData.availability, chargesPerSession: formData.chargesPerSession,
-          city: formData.city,
+          gender: values.gender,
+          phone: values.phone,
+          specialty: values.specialty,
+          qualifications: values.qualifications,
+          yearsOfExperience: values.yearsOfExperience,
+          availability: values.availability,
+          chargesPerSession: values.chargesPerSession,
+          city: values.city,
         });
       }
 
       const data = await registerUser(payload);
       loginUserContext(data.token, data.user);
-      toast.success(`${formData.username} has created account`);
+      toast.success(`${values.username} has created account`);
 
       setTimeout(() => {
         if (data.user.role === "patient") navigate("/patient");
@@ -74,13 +188,36 @@ const SignUp = () => {
         else navigate("/login");
       }, 1000);
     } catch (err) {
-      setError(err.message);
+      setServerError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const canGoStep2 = formData.fullName && formData.username && formData.email && formData.password;
+  const canGoStep2 =
+    formData.fullName?.trim()?.length >= 3 &&
+    usernameRegex.test(formData.username || "") &&
+    emailRegex.test(formData.email || "") &&
+    strongPasswordRegex.test(formData.password || "");
+
+  const canSubmitRoleFields =
+    formData.role === "admin" ||
+    (formData.role === "patient" &&
+      Number(formData.age) >= 1 &&
+      Number(formData.age) <= 120 &&
+      !!formData.gender &&
+      phoneRegex.test(formData.phone || "") &&
+      !!formData.city?.trim()) ||
+    (formData.role === "doctor" &&
+      !!formData.specialty?.trim() &&
+      !!formData.gender &&
+      phoneRegex.test(formData.phone || "") &&
+      !!formData.qualifications?.trim() &&
+      Number(formData.yearsOfExperience) >= 0 &&
+      Number(formData.yearsOfExperience) <= 60 &&
+      Number(formData.chargesPerSession) > 0 &&
+      !!formData.availability?.trim() &&
+      !!formData.city?.trim());
 
   const roles = [
     { value: "patient", label: "Patient", icon: <User size={22} />, desc: "Book appointments & manage health" },
@@ -95,45 +232,50 @@ const SignUp = () => {
     { icon: <Award size={18} />, text: "Trusted by 10K+ users" },
   ];
 
+  const getInputWrapStyle = (name) => ({
+    ...s.inputWrap,
+    borderColor: errors[name] ? "#dc2626" : focusedField === name ? "#16a34a" : "#e5e7eb",
+    boxShadow: focusedField === name ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
+  });
+
   /* ─── Input field helper ─── */
   const renderField = (name, label, icon, type = "text", placeholder = "", required = false) => (
     <div style={s.fieldGroup} className="field-group">
       <label style={s.label} className="label">{label}</label>
-      <div style={{
-        ...s.inputWrap,
-        borderColor: focusedField === name ? "#16a34a" : "#e5e7eb",
-        boxShadow: focusedField === name ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-      }} className="input-wrap">
+      <div style={getInputWrapStyle(name)} className="input-wrap">
         {icon}
         <input
-          type={type} name={name} placeholder={placeholder}
-          value={formData[name]} onChange={handleChange}
-          onFocus={() => setFocusedField(name)}
-          onBlur={() => setFocusedField("")}
-          required={required} style={s.input} className="input"
+          type={type}
+          placeholder={placeholder}
+          {...register(name, {
+            onFocus: () => setFocusedField(name),
+            onBlur: () => setFocusedField(""),
+          })}
+          required={required}
+          style={s.input}
+          className="input"
         />
       </div>
+      {errors[name] && <p style={s.fieldError}>{errors[name]?.message}</p>}
     </div>
   );
 
   const renderSelect = (name, label, icon, options) => (
     <div style={s.fieldGroup} className="field-group">
       <label style={s.label} className="label">{label}</label>
-      <div style={{
-        ...s.inputWrap,
-        borderColor: focusedField === name ? "#16a34a" : "#e5e7eb",
-        boxShadow: focusedField === name ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-      }} className="input-wrap">
+      <div style={getInputWrapStyle(name)} className="input-wrap">
         {icon}
         <select
-          name={name} value={formData[name]} onChange={handleChange}
-          onFocus={() => setFocusedField(name)}
-          onBlur={() => setFocusedField("")}
+          {...register(name, {
+            onFocus: () => setFocusedField(name),
+            onBlur: () => setFocusedField(""),
+          })}
           style={{ ...s.input, cursor: "pointer" }} className="input"
         >
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
+      {errors[name] && <p style={s.fieldError}>{errors[name]?.message}</p>}
     </div>
   );
 
@@ -196,13 +338,13 @@ const SignUp = () => {
             </p>
           </div>
 
-          {error && (
+          {serverError && (
             <div style={s.errorBox}>
-              <AlertCircle size={16} /> {error}
+              <AlertCircle size={16} /> {serverError}
             </div>
           )}
 
-          <form onSubmit={handleSignup} style={{ width: "100%" }}>
+          <form onSubmit={handleSubmit(handleSignup)} style={{ width: "100%" }}>
             {/* ── STEP 1: Account Info ── */}
             {step === 1 && (
               <>
@@ -218,7 +360,10 @@ const SignUp = () => {
                         boxShadow: formData.role === r.value ? "0 0 0 3px rgba(22,163,74,0.1)" : "none",
                       }}
                       className="role-card"
-                      onClick={() => setFormData({ ...formData, role: r.value, gender: "" })}
+                      onClick={() => {
+                        setValue("role", r.value, { shouldValidate: true, shouldDirty: true });
+                        setValue("gender", "", { shouldValidate: true, shouldDirty: true });
+                      }}
                     >
                       <div style={{
                         ...s.roleIcon,
@@ -235,6 +380,8 @@ const SignUp = () => {
                   ))}
                 </div>
 
+                <input type="hidden" {...register("role")} />
+
                 {renderField("fullName", "Full Name", <User size={18} color={focusedField === "fullName" ? "#16a34a" : "#9ca3af"} />, "text", "Enter your full name", true)}
                 {renderField("username", "Username", <UserPlus size={18} color={focusedField === "username" ? "#16a34a" : "#9ca3af"} />, "text", "Choose a unique username", true)}
                 {renderField("email", "Email Address", <Mail size={18} color={focusedField === "email" ? "#16a34a" : "#9ca3af"} />, "email", "name@example.com", true)}
@@ -242,24 +389,22 @@ const SignUp = () => {
                 {/* Password with toggle */}
                 <div style={s.fieldGroup}>
                   <label style={s.label}>Password</label>
-                  <div style={{
-                    ...s.inputWrap,
-                    borderColor: focusedField === "password" ? "#16a34a" : "#e5e7eb",
-                    boxShadow: focusedField === "password" ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
-                  }}>
+                  <div style={getInputWrapStyle("password")}>
                     <Lock size={18} color={focusedField === "password" ? "#16a34a" : "#9ca3af"} />
                     <input
                       type={showPassword ? "text" : "password"}
-                      name="password" placeholder="Create a strong password"
-                      value={formData.password} onChange={handleChange}
-                      onFocus={() => setFocusedField("password")}
-                      onBlur={() => setFocusedField("")}
+                      placeholder="Create a strong password"
+                      {...register("password", {
+                        onFocus: () => setFocusedField("password"),
+                        onBlur: () => setFocusedField(""),
+                      })}
                       required style={s.input}
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
                       {showPassword ? <EyeOff size={18} color="#9ca3af" /> : <Eye size={18} color="#9ca3af" />}
                     </button>
                   </div>
+                  {errors.password && <p style={s.fieldError}>{errors.password.message}</p>}
                 </div>
 
                 <button
@@ -269,7 +414,10 @@ const SignUp = () => {
                     opacity: canGoStep2 ? 1 : 0.5,
                     cursor: canGoStep2 ? "pointer" : "not-allowed",
                   }}
-                  onClick={() => canGoStep2 && setStep(2)}
+                  onClick={async () => {
+                    const ok = await trigger(["fullName", "username", "email", "password", "role"]);
+                    if (ok) setStep(2);
+                  }}
                   disabled={!canGoStep2}
                 >
                   Continue <ArrowRight size={18} />
@@ -303,18 +451,24 @@ const SignUp = () => {
                       <label style={s.label} className="label">Medical History (optional)</label>
                       <div style={{
                         ...s.inputWrap, alignItems: "flex-start", padding: "12px 14px",
-                        borderColor: focusedField === "medicalHistory" ? "#16a34a" : "#e5e7eb",
+                        borderColor: errors.medicalHistory
+                          ? "#dc2626"
+                          : focusedField === "medicalHistory"
+                            ? "#16a34a"
+                            : "#e5e7eb",
                         boxShadow: focusedField === "medicalHistory" ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
                       }} className="input-wrap">
                         <FileText size={18} color={focusedField === "medicalHistory" ? "#16a34a" : "#9ca3af"} style={{ marginTop: "2px" }} />
                         <textarea
-                          name="medicalHistory" placeholder="Brief medical history or conditions"
-                          value={formData.medicalHistory} onChange={handleChange}
-                          onFocus={() => setFocusedField("medicalHistory")}
-                          onBlur={() => setFocusedField("")}
+                          placeholder="Brief medical history or conditions"
+                          {...register("medicalHistory", {
+                            onFocus: () => setFocusedField("medicalHistory"),
+                            onBlur: () => setFocusedField(""),
+                          })}
                           style={{ ...s.input, resize: "vertical", minHeight: "70px" }} className="input"
                         />
                       </div>
+                      {errors.medicalHistory && <p style={s.fieldError}>{errors.medicalHistory.message}</p>}
                     </div>
                   </>
                 )}
@@ -352,7 +506,11 @@ const SignUp = () => {
                   </div>
                 )}
 
-                <button type="submit" style={s.submitBtn} disabled={loading}>
+                <button
+                  type="submit"
+                  style={{ ...s.submitBtn, ...((loading || !canSubmitRoleFields) ? s.submitBtnDisabled : {}) }}
+                  disabled={loading || !canSubmitRoleFields}
+                >
                   {loading ? (
                     <><Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} /> Creating Account...</>
                   ) : (
@@ -567,6 +725,17 @@ const s = {
     cursor: "pointer", transition: "all 0.3s",
     boxShadow: "0 4px 14px rgba(22,163,74,0.25)",
     marginTop: "4px",
+  },
+  submitBtnDisabled: {
+    opacity: 0.55,
+    cursor: "not-allowed",
+    boxShadow: "none",
+  },
+  fieldError: {
+    marginTop: "6px",
+    color: "#dc2626",
+    fontSize: "12px",
+    fontWeight: "500",
   },
   divider: {
     display: "flex", alignItems: "center", gap: "14px",

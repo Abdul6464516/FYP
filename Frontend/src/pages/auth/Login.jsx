@@ -3,53 +3,80 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authActions";
 import { toast } from "react-toastify";
 import { useUser } from "../../context/UserContext";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Heart, Mail, Lock, Eye, EyeOff, ArrowRight, Stethoscope,
   Users, ShieldCheck, ChevronLeft, User, Settings, Loader2,
   CheckCircle, Video, CalendarCheck, AlertCircle
 } from "lucide-react";
 
+const loginSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(1, "Email or username is required")
+    .refine((value) => {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      const isUsername = /^[a-zA-Z0-9._-]{3,30}$/.test(value);
+      return isEmail || isUsername;
+    }, "Enter a valid email or username"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+  role: z.enum(["patient", "doctor", "admin"]),
+});
+
 const Login = () => {
   const navigate = useNavigate();
   const { loginUserContext } = useUser();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState("");
 
-  const [formData, setFormData] = useState({
-    identifier: "",
-    password: "",
-    role: "patient",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    watch,
+    setValue,
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
+    defaultValues: {
+      identifier: "",
+      password: "",
+      role: "patient",
+    },
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const selectedRole = watch("role");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  const handleLogin = async (values) => {
+    setServerError("");
     setLoading(true);
     try {
       const data = await loginUser({
-        identifier: formData.identifier,
-        password: formData.password,
+        identifier: values.identifier.trim(),
+        password: values.password,
       });
-      if (data.user.role !== formData.role) {
-        setError(`You are registered as a ${data.user.role}, not a ${formData.role}. Please select the correct role.`);
+      if (data.user.role !== values.role) {
+        setServerError(`You are registered as a ${data.user.role}, not a ${values.role}. Please select the correct role.`);
         setLoading(false);
         return;
       }
       loginUserContext(data.token, data.user);
       toast.success(`Welcome back, ${data.user.fullName}!`);
       setTimeout(() => {
-        if (formData.role === "patient") navigate("/patient");
-        else if (formData.role === "doctor") navigate("/doctor");
-        else if (formData.role === "admin") navigate("/admin");
+        if (values.role === "patient") navigate("/patient");
+        else if (values.role === "doctor") navigate("/doctor");
+        else if (values.role === "admin") navigate("/admin");
       }, 1000);
     } catch (err) {
-      setError(err.message);
+      setServerError(err.message);
     } finally {
       setLoading(false);
     }
@@ -136,9 +163,9 @@ const Login = () => {
             <p style={s.formSub}>Enter your credentials to access your account</p>
           </div>
 
-          {error && (
+          {serverError && (
             <div style={s.errorBox}>
-              <AlertCircle size={16} /> {error}
+              <AlertCircle size={16} /> {serverError}
             </div>
           )}
 
@@ -148,21 +175,21 @@ const Login = () => {
               <div
                 key={r.value}
                 style={{...s.roleCard,
-                  borderColor: formData.role === r.value ? "#16a34a" : "#e5e7eb",
-                  backgroundColor: formData.role === r.value ? "#f0fdf4" : "#fff",
-                  boxShadow: formData.role === r.value ? "0 0 0 3px rgba(22,163,74,0.1)" : "none",
+                  borderColor: selectedRole === r.value ? "#16a34a" : "#e5e7eb",
+                  backgroundColor: selectedRole === r.value ? "#f0fdf4" : "#fff",
+                  boxShadow: selectedRole === r.value ? "0 0 0 3px rgba(22,163,74,0.1)" : "none",
                 }}
                 className="role-card"
-                onClick={() => setFormData({ ...formData, role: r.value })}
+                onClick={() => setValue("role", r.value, { shouldValidate: true, shouldDirty: true })}
               >
                 <div style={{
                   ...s.roleIcon,
-                  color: formData.role === r.value ? "#16a34a" : "#9ca3af",
-                  backgroundColor: formData.role === r.value ? "#dcfce7" : "#f3f4f6",
+                  color: selectedRole === r.value ? "#16a34a" : "#9ca3af",
+                  backgroundColor: selectedRole === r.value ? "#dcfce7" : "#f3f4f6",
                 }}>
                   {r.icon}
                 </div>
-                <div style={{ fontWeight: "600", fontSize: "13px", color: formData.role === r.value ? "#15803d" : "#374151" }}>
+                <div style={{ fontWeight: "600", fontSize: "13px", color: selectedRole === r.value ? "#15803d" : "#374151" }}>
                   {r.label}
                 </div>
                 <div style={{ fontSize: "10px", color: "#9ca3af", marginTop: "1px" }}>{r.desc}</div>
@@ -170,28 +197,33 @@ const Login = () => {
             ))}
           </div>
 
-          <form onSubmit={handleLogin} style={{ width: "100%" }}>
+          <input type="hidden" {...register("role")} />
+
+          <form onSubmit={handleSubmit(handleLogin)} style={{ width: "100%" }}>
             {/* Email/Username */}
             <div style={s.fieldGroup}>
               <label style={s.label}>Email or Username</label>
               <div style={{
                 ...s.inputWrap,
-                borderColor: focusedField === "identifier" ? "#16a34a" : "#e5e7eb",
+                borderColor: errors.identifier
+                  ? "#dc2626"
+                  : focusedField === "identifier"
+                    ? "#16a34a"
+                    : "#e5e7eb",
                 boxShadow: focusedField === "identifier" ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
               }}>
                 <Mail size={18} color={focusedField === "identifier" ? "#16a34a" : "#9ca3af"} />
                 <input
                   type="text"
-                  name="identifier"
                   placeholder="Enter your email or username"
-                  value={formData.identifier}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField("identifier")}
-                  onBlur={() => setFocusedField("")}
-                  required
+                  {...register("identifier", {
+                    onFocus: () => setFocusedField("identifier"),
+                    onBlur: () => setFocusedField(""),
+                  })}
                   style={s.input}
                 />
               </div>
+              {errors.identifier && <p style={s.fieldError}>{errors.identifier.message}</p>}
             </div>
 
             {/* Password */}
@@ -199,29 +231,39 @@ const Login = () => {
               <label style={s.label}>Password</label>
               <div style={{
                 ...s.inputWrap,
-                borderColor: focusedField === "password" ? "#16a34a" : "#e5e7eb",
+                borderColor: errors.password
+                  ? "#dc2626"
+                  : focusedField === "password"
+                    ? "#16a34a"
+                    : "#e5e7eb",
                 boxShadow: focusedField === "password" ? "0 0 0 3px rgba(22,163,74,0.08)" : "none",
               }}>
                 <Lock size={18} color={focusedField === "password" ? "#16a34a" : "#9ca3af"} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
                   placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField("password")}
-                  onBlur={() => setFocusedField("")}
-                  required
+                  {...register("password", {
+                    onFocus: () => setFocusedField("password"),
+                    onBlur: () => setFocusedField(""),
+                  })}
                   style={s.input}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
                   {showPassword ? <EyeOff size={18} color="#9ca3af" /> : <Eye size={18} color="#9ca3af" />}
                 </button>
               </div>
+              {errors.password && <p style={s.fieldError}>{errors.password.message}</p>}
             </div>
 
             {/* Submit */}
-            <button type="submit" style={s.submitBtn} disabled={loading}>
+            <button
+              type="submit"
+              style={{
+                ...s.submitBtn,
+                ...((loading || !isValid) ? s.submitBtnDisabled : {}),
+              }}
+              disabled={loading || !isValid}
+            >
               {loading ? (
                 <><Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} /> Signing in...</>
               ) : (
@@ -401,6 +443,17 @@ const s = {
     cursor: "pointer", transition: "all 0.3s",
     boxShadow: "0 4px 14px rgba(22,163,74,0.25)",
     marginTop: "4px",
+  },
+  submitBtnDisabled: {
+    opacity: 0.55,
+    cursor: "not-allowed",
+    boxShadow: "none",
+  },
+  fieldError: {
+    marginTop: "6px",
+    color: "#dc2626",
+    fontSize: "12px",
+    fontWeight: "500",
   },
   divider: {
     display: "flex", alignItems: "center", gap: "14px",
