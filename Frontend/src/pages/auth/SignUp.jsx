@@ -10,7 +10,7 @@ import {
   Heart, User, Mail, Lock, Eye, EyeOff, ArrowRight, Stethoscope,
   Phone, MapPin, Calendar, FileText, Clock, DollarSign, Award,
   ChevronLeft, Loader2, AlertCircle, UserPlus, ShieldCheck,
-  CheckCircle, Briefcase, GraduationCap, Settings
+  CheckCircle, Briefcase, GraduationCap, Settings, XCircle, Info
 } from "lucide-react";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -99,6 +99,15 @@ const signUpSchema = z
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: "City is required", path: ["city"] });
       }
     }
+
+    if (role === "admin") {
+      if (!data.phone || !phoneRegex.test(data.phone)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone number must be exactly 11 digits", path: ["phone"] });
+      }
+      if (!data.city || data.city.trim().length < 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "City is required", path: ["city"] });
+      }
+    }
   });
 
 const SignUp = () => {
@@ -110,6 +119,8 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState("");
   const [step, setStep] = useState(1); // Step 1: account, Step 2: role details
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState("");
 
   const {
     register,
@@ -177,7 +188,24 @@ const SignUp = () => {
         });
       }
 
+      if (values.role === "admin") {
+        Object.assign(payload, {
+          phone: values.phone,
+          city: values.city,
+        });
+      }
+
       const data = await registerUser(payload);
+
+      // Check verification status
+      if (data.user.role !== "admin" && data.user.verificationStatus === "pending") {
+        setVerificationMessage(`Your ${data.user.role} account has been created successfully! Please wait for the administrator to verify your account before you can access the system.`);
+        setShowVerificationModal(true);
+        setLoading(false);
+        return;
+      }
+
+      // If verified or admin, proceed with login
       loginUserContext(data.token, data.user);
       toast.success(`${values.username} has created account`);
 
@@ -194,6 +222,24 @@ const SignUp = () => {
     }
   };
 
+  const handleVerificationModalOk = () => {
+    setShowVerificationModal(false);
+    setVerificationMessage("");
+    // Clear localStorage and redirect to home
+    localStorage.clear();
+    navigate("/");
+  };
+
+  // Verification modal content
+  const getVerificationModalContent = () => {
+    return {
+      icon: <Info size={48} color="#3b82f6" />,
+      title: "Account Created!",
+      message: verificationMessage,
+      buttonText: "Back to Home"
+    };
+  };
+
   const canGoStep2 =
     formData.fullName?.trim()?.length >= 3 &&
     usernameRegex.test(formData.username || "") &&
@@ -201,7 +247,9 @@ const SignUp = () => {
     strongPasswordRegex.test(formData.password || "");
 
   const canSubmitRoleFields =
-    formData.role === "admin" ||
+    (formData.role === "admin" &&
+      phoneRegex.test(formData.phone || "") &&
+      !!formData.city?.trim()) ||
     (formData.role === "patient" &&
       Number(formData.age) >= 1 &&
       Number(formData.age) <= 120 &&
@@ -496,14 +544,14 @@ const SignUp = () => {
                   </>
                 )}
 
-                {/* Admin — no extra fields */}
+                {/* Admin fields */}
                 {formData.role === "admin" && (
-                  <div style={s.adminNotice}>
-                    <ShieldCheck size={32} color="#16a34a" />
-                    <p style={{ margin: "8px 0 0", fontSize: "14px", color: "#6b7280", lineHeight: "1.6" }}>
-                      No additional information required for admin accounts. Click below to create your account.
-                    </p>
-                  </div>
+                  <>
+                    <div style={s.twoCol} className="two-col">
+                      {renderField("phone", "Contact Number", <Phone size={18} color={focusedField === "phone" ? "#16a34a" : "#9ca3af"} />, "tel", "+92 300 1234567")}
+                      {renderField("city", "City", <MapPin size={18} color={focusedField === "city" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Lahore")}
+                    </div>
+                  </>
                 )}
 
                 <button
@@ -534,7 +582,38 @@ const SignUp = () => {
         </div>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      {/* Verification Modal */}
+      {showVerificationModal && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalIconContainer}>
+              {getVerificationModalContent()?.icon}
+            </div>
+            <h3 style={s.modalTitle}>{getVerificationModalContent()?.title}</h3>
+            <p style={s.modalMessage}>{getVerificationModalContent()?.message}</p>
+            <button
+              onClick={handleVerificationModalOk}
+              style={s.modalButton}
+            >
+              {getVerificationModalContent()?.buttonText}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { 
+          from { 
+            opacity: 0; 
+            transform: translateY(20px); 
+          } 
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          } 
+        }
+      `}</style>
     </div>
   );
 };
@@ -544,6 +623,9 @@ const s = {
   page: {
     minHeight: "100vh", display: "flex",
     fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+    "@media (max-width: 768px)": {
+      flexDirection: "column",
+    },
   },
 
   /* LEFT */
@@ -552,6 +634,11 @@ const s = {
     background: "linear-gradient(160deg, #15803d 0%, #16a34a 40%, #0d9488 100%)",
     display: "flex", alignItems: "center", justifyContent: "center",
     padding: "60px 44px", overflow: "hidden",
+    "@media (max-width: 768px)": {
+      width: "100%",
+      minHeight: "auto",
+      padding: "40px 20px",
+    },
   },
   leftOverlay: {
     position: "absolute", inset: 0,
@@ -752,6 +839,39 @@ const s = {
     border: "2px solid #e5e7eb", backgroundColor: "#fff",
     color: "#374151", fontSize: "14px", fontWeight: "600",
     cursor: "pointer", transition: "all 0.2s",
+  },
+
+  /* Modal styles */
+  modalOverlay: {
+    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex",
+    alignItems: "center", justifyContent: "center", zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: "#fff", borderRadius: "16px", padding: "40px 32px",
+    maxWidth: "420px", width: "90%", textAlign: "center",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+    animation: "slideUp 0.3s ease-out",
+  },
+  modalIconContainer: {
+    display: "flex", justifyContent: "center", marginBottom: "20px",
+  },
+  modalTitle: {
+    fontSize: "24px", fontWeight: "800", color: "#111827",
+    margin: "0 0 12px", letterSpacing: "-0.5px",
+  },
+  modalMessage: {
+    fontSize: "15px", color: "#6b7280", lineHeight: "1.6",
+    margin: "0 0 28px",
+  },
+  modalButton: {
+    width: "100%", display: "flex", alignItems: "center",
+    justifyContent: "center", gap: "8px",
+    padding: "14px", borderRadius: "12px", border: "none",
+    background: "linear-gradient(135deg, #16a34a, #15803d)",
+    color: "#fff", fontSize: "15px", fontWeight: "700",
+    cursor: "pointer", transition: "all 0.3s",
+    boxShadow: "0 4px 14px rgba(22,163,74,0.25)",
   },
 };
 

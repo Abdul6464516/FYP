@@ -75,7 +75,7 @@ async function getAllDoctors(req, res) {
   try {
     const { specialty, availability, city, search } = req.query;
 
-    const filter = { role: 'doctor' };
+    const filter = { role: 'doctor', verificationStatus: 'verified' };
 
     if (specialty && specialty !== 'All') {
       filter.specialty = { $regex: specialty, $options: 'i' };
@@ -98,7 +98,7 @@ async function getAllDoctors(req, res) {
     }
 
     const doctors = await User.find(filter).select(
-      'fullName specialty gender qualifications yearsOfExperience availability chargesPerSession city'
+      'fullName specialty gender qualifications yearsOfExperience availability chargesPerSession city verificationStatus'
     );
 
     res.json({ doctors });

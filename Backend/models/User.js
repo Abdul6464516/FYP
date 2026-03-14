@@ -23,6 +23,13 @@ const userSchema = new Schema({
   yearsOfExperience: { type: Number },
   availability: { type: String },
   chargesPerSession: { type: Number },
+
+  // Verification status for doctor and patient
+  verificationStatus: { 
+    type: String, 
+    enum: ['pending', 'verified', 'rejected'], 
+    default: 'pending' 
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

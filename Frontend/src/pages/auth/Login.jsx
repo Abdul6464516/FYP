@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Heart, Mail, Lock, Eye, EyeOff, ArrowRight, Stethoscope,
   Users, ShieldCheck, ChevronLeft, User, Settings, Loader2,
-  CheckCircle, Video, CalendarCheck, AlertCircle
+  CheckCircle, Video, CalendarCheck, AlertCircle, XCircle
 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -36,6 +36,8 @@ const Login = () => {
   const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState("");
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const {
     register,
@@ -68,6 +70,23 @@ const Login = () => {
         setLoading(false);
         return;
       }
+
+      // Check verification status
+      if (data.user.role !== "admin") {
+        if (data.user.verificationStatus === "pending") {
+          setStatusMessage("Your account is pending admin approval. Please wait for the administrator to verify your account before you can access the system.");
+          setShowStatusModal(true);
+          setLoading(false);
+          return;
+        } else if (data.user.verificationStatus === "rejected") {
+          setStatusMessage("Your account has been rejected by the administrator. Please contact support for more information.");
+          setShowStatusModal(true);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If verified or admin, proceed with login
       loginUserContext(data.token, data.user);
       toast.success(`Welcome back, ${data.user.fullName}!`);
       setTimeout(() => {
@@ -80,6 +99,34 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStatusModalOk = () => {
+    setShowStatusModal(false);
+    setStatusMessage("");
+    // Clear localStorage and redirect to home
+    localStorage.clear();
+    navigate("/");
+  };
+
+  // Status modal content
+  const getModalContent = () => {
+    if (statusMessage.includes("pending")) {
+      return {
+        icon: <AlertCircle size={48} color="#f59e0b" />,
+        title: "Pending Verification",
+        message: statusMessage,
+        buttonText: "Back to Home"
+      };
+    } else if (statusMessage.includes("rejected")) {
+      return {
+        icon: <XCircle size={48} color="#ef4444" />,
+        title: "Account Rejected",
+        message: statusMessage,
+        buttonText: "Back to Home"
+      };
+    }
+    return null;
   };
 
   const roles = [
@@ -286,7 +333,38 @@ const Login = () => {
         </div>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      {/* Status Modal */}
+      {showStatusModal && (
+        <div style={s.modalOverlay}>
+          <div style={s.modalContent}>
+            <div style={s.modalIconContainer}>
+              {getModalContent()?.icon}
+            </div>
+            <h3 style={s.modalTitle}>{getModalContent()?.title}</h3>
+            <p style={s.modalMessage}>{getModalContent()?.message}</p>
+            <button
+              onClick={handleStatusModalOk}
+              style={s.modalButton}
+            >
+              {getModalContent()?.buttonText}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { 
+          from { 
+            opacity: 0; 
+            transform: translateY(20px); 
+          } 
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          } 
+        }
+      `}</style>
     </div>
   );
 };
@@ -470,6 +548,39 @@ const s = {
     border: "2px solid #e5e7eb", backgroundColor: "#fff",
     color: "#374151", fontSize: "14px", fontWeight: "600",
     cursor: "pointer", transition: "all 0.2s",
+  },
+
+  /* Modal styles */
+  modalOverlay: {
+    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex",
+    alignItems: "center", justifyContent: "center", zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: "#fff", borderRadius: "16px", padding: "40px 32px",
+    maxWidth: "420px", width: "90%", textAlign: "center",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+    animation: "slideUp 0.3s ease-out",
+  },
+  modalIconContainer: {
+    display: "flex", justifyContent: "center", marginBottom: "20px",
+  },
+  modalTitle: {
+    fontSize: "24px", fontWeight: "800", color: "#111827",
+    margin: "0 0 12px", letterSpacing: "-0.5px",
+  },
+  modalMessage: {
+    fontSize: "15px", color: "#6b7280", lineHeight: "1.6",
+    margin: "0 0 28px",
+  },
+  modalButton: {
+    width: "100%", display: "flex", alignItems: "center",
+    justifyContent: "center", gap: "8px",
+    padding: "14px", borderRadius: "12px", border: "none",
+    background: "linear-gradient(135deg, #16a34a, #15803d)",
+    color: "#fff", fontSize: "15px", fontWeight: "700",
+    cursor: "pointer", transition: "all 0.3s",
+    boxShadow: "0 4px 14px rgba(22,163,74,0.25)",
   },
 };
 

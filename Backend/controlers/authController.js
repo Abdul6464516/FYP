@@ -22,23 +22,27 @@ async function register(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const userData = { fullName, email, username, password: hash, role, city };
+    const userData = { fullName, email, username, password: hash, role, city, phone };
 
     if (role === 'patient') {
       userData.age = age;
       userData.gender = gender;
-      userData.phone = phone;
       userData.medicalHistory = medicalHistory;
+      userData.verificationStatus = 'pending';
     }
 
     if (role === 'doctor') {
       userData.gender = gender;
-      userData.phone = phone;
       userData.specialty = specialty;
       userData.qualifications = qualifications;
       userData.yearsOfExperience = yearsOfExperience;
       userData.availability = availability;
       userData.chargesPerSession = chargesPerSession;
+      userData.verificationStatus = 'pending';
+    }
+
+    if (role === 'admin') {
+      userData.verificationStatus = 'verified';
     }
 
     const user = new User(userData);

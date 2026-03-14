@@ -86,9 +86,9 @@ const AdminDashboard = () => {
                 onMouseLeave={() => setHovered(null)}
                 style={{
                   ...s.navItem,
-                  backgroundColor: active ? "#eef2ff" : hovered === item.id ? "#f9fafb" : "transparent",
-                  color: active ? "#4f46e5" : "#4b5563",
-                  borderLeft: active ? "3px solid #4f46e5" : "3px solid transparent",
+                  backgroundColor: active ? "#f0fdf4" : hovered === item.id ? "#f9fafb" : "transparent",
+                  color: active ? "#16a34a" : "#4b5563",
+                  borderLeft: active ? "3px solid #16a34a" : "3px solid transparent",
                   fontWeight: active ? "600" : "500",
                 }}
               >
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
                   {item.icon}
                   <span>{item.label}</span>
                 </div>
-                {active && <ChevronRight size={16} color="#4f46e5" />}
+                {active && <ChevronRight size={16} color="#16a34a" />}
               </button>
             );
           })}
@@ -154,24 +154,24 @@ const s = {
   brand: { display: "flex", alignItems: "center", gap: "10px", padding: "22px 22px 18px" },
   brandIcon: {
     width: "36px", height: "36px", borderRadius: "10px",
-    background: "linear-gradient(135deg, #4f46e5, #6366f1)",
+    background: "linear-gradient(135deg, #16a34a, #15803d)",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
   brandName: { fontWeight: "800", fontSize: "20px", color: "#111827", letterSpacing: "-0.5px", display: "block" },
-  brandSub: { fontSize: "10px", fontWeight: "600", color: "#6366f1", letterSpacing: "0.5px", textTransform: "uppercase" },
+  brandSub: { fontSize: "10px", fontWeight: "600", color: "#16a34a", letterSpacing: "0.5px", textTransform: "uppercase" },
 
   userCard: {
     display: "flex", alignItems: "center", gap: "12px",
     margin: "0 16px 16px", padding: "14px",
-    borderRadius: "14px", backgroundColor: "#eef2ff", border: "1px solid #e0e7ff",
+    borderRadius: "14px", backgroundColor: "#f0fdf4", border: "1px solid #dcfce7",
   },
   userAvatar: {
     width: "40px", height: "40px", borderRadius: "50%",
-    background: "linear-gradient(135deg, #4f46e5, #6366f1)", color: "#fff",
+    background: "linear-gradient(135deg, #0d9488, #0f766e)", color: "#fff",
     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
   },
   userFullName: { fontWeight: "600", fontSize: "14px", color: "#111827" },
-  userRole: { fontSize: "11px", color: "#4f46e5", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
+  userRole: { fontSize: "11px", color: "#0d9488", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
 
   nav: { flex: 1, padding: "4px 12px", overflowY: "auto" },
   navLabel: { fontSize: "10px", fontWeight: "700", color: "#9ca3af", letterSpacing: "1px", padding: "8px 10px 6px", marginTop: "4px" },
@@ -202,12 +202,12 @@ const s = {
   roleChip: {
     display: "flex", alignItems: "center", gap: "5px",
     padding: "5px 12px", borderRadius: "20px",
-    backgroundColor: "#eef2ff", color: "#4f46e5",
+    backgroundColor: "#f0fdf4", color: "#16a34a",
     fontSize: "12px", fontWeight: "600",
   },
   headerAvatar: {
     width: "38px", height: "38px", borderRadius: "50%",
-    background: "linear-gradient(135deg, #4f46e5, #6366f1)", color: "#fff",
+    background: "linear-gradient(135deg, #0d9488, #0f766e)", color: "#fff",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
 
