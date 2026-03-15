@@ -312,9 +312,7 @@ async function getSystemMonitoring(req, res) {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     const todayString = `${year}-${month}-${day}`; // Format: "2026-03-14"
-    
-    console.log('Today date string:', todayString); // Debug log
-    
+        
     // Get total consultations (active + completed) for today
     const totalConsultations = await Consultation.countDocuments({
       $or: [
@@ -328,7 +326,7 @@ async function getSystemMonitoring(req, res) {
       date: todayString
     });
     
-    console.log('Appointments found:', appointmentsToday); // Debug log
+   
     
     // Calculate average wait time (from pending to approved)
     const pendingAppointments = await Appointment.find({ status: 'pending' }).limit(10);
@@ -451,6 +449,159 @@ function getTimeAgo(date) {
   return `${days} day${days > 1 ? 's' : ''} ago`;
 }
 
+// Get analytics - Top performing doctors with ratings
+async function getTopDoctors(req, res) {
+  try {
+    const topDoctors = await Feedback.aggregate([
+      {
+        $group: {
+          _id: "$reviewOn",
+          avgRating: { $avg: "$rating" },
+          consultationCount: { $sum: 1 }
+        }
+      },
+      { $sort: { consultationCount: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "doctorInfo"
+        }
+      },
+      { $unwind: "$doctorInfo" },
+      {
+        $project: {
+          _id: 0,
+          doctorId: "$_id",
+          name: "$doctorInfo.fullName",
+          consultations: "$consultationCount",
+          rating: { $round: ["$avgRating", 1] }
+        }
+      }
+    ]);
+
+    res.json(topDoctors);
+  } catch (err) {
+    console.error('Error fetching top doctors:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get KPI metrics
+async function getKPIMetrics(req, res) {
+  try {
+    // Total consultations count
+    const totalConsultations = await Consultation.countDocuments();
+
+    // New user registrations (assuming users have createdAt)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const newRegistrations = await User.countDocuments({
+      createdAt: { $gte: thirtyDaysAgo },
+      role: { $in: ['doctor', 'patient'] }
+    });
+
+    // Last month consultations for trend
+    const lastMonthConsultations = await Consultation.countDocuments({
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+
+    // Calculate percentage changes
+    const totalConsultationsLastMonth = await Consultation.countDocuments({
+      createdAt: {
+        $gte: new Date(thirtyDaysAgo.getTime() - 30 * 24 * 60 * 60 * 1000),
+        $lt: thirtyDaysAgo
+      }
+    });
+
+    const consultationsTrend = totalConsultationsLastMonth > 0
+      ? (((totalConsultations - totalConsultationsLastMonth) / totalConsultationsLastMonth) * 100).toFixed(1)
+      : 0;
+
+    res.json({
+      totalConsultations,
+      newRegistrations,
+      consultationsTrend: parseFloat(consultationsTrend),
+      consultationsLastMonth: lastMonthConsultations
+    });
+  } catch (err) {
+    console.error('Error fetching KPI metrics:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get engagement metrics
+async function getEngagementMetrics(req, res) {
+  try {
+    // Patient Retention: percentage of returning patients
+    const totalPatients = await User.countDocuments({ role: 'patient' });
+    const returningPatients = await Consultation.aggregate([
+      { $group: { _id: "$patient" } },
+      { $count: "total" }
+    ]);
+    const patientRetention = totalPatients > 0
+      ? Math.round((returningPatients[0]?.total || 0 / totalPatients) * 100)
+      : 0;
+
+    // App Usage Frequency: consultations per doctor (active doctors)
+    const activeDoctors = await User.countDocuments({ role: 'doctor' });
+    const totalConsultations = await Consultation.countDocuments();
+    const appUsageFrequency = activeDoctors > 0
+      ? Math.round((totalConsultations / activeDoctors) * 10)
+      : 0;
+
+    // Consultation Completion: completed consultations percentage
+    const completedConsultations = await Consultation.countDocuments({ status: 'completed' });
+    const allConsultations = await Consultation.countDocuments();
+    const completionRate = allConsultations > 0
+      ? Math.round((completedConsultations / allConsultations) * 100)
+      : 0;
+
+    const metrics = [
+      { label: "Patient Retention", value: Math.min(patientRetention, 100), color: "#4f46e5" },
+      { label: "App Usage Frequency", value: Math.min(appUsageFrequency, 100), color: "#16a34a" },
+      { label: "Consultation Completion", value: completionRate, color: "#f59e0b" }
+    ];
+
+    res.json(metrics);
+  } catch (err) {
+    console.error('Error fetching engagement metrics:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get monthly consultation trend data
+async function getConsultationTrend(req, res) {
+  try {
+    const months = [];
+    const consultationData = [];
+
+    // Get last 6 months data
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+      const monthName = startOfMonth.toLocaleDateString('en-US', { month: 'short' });
+      months.push(monthName);
+
+      const count = await Consultation.countDocuments({
+        createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+      });
+      consultationData.push(count);
+    }
+
+    res.json({ months, consultationData });
+  } catch (err) {
+    console.error('Error fetching consultation trend:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 module.exports = {
   getAdminProfile,
   updateAdminProfile,
@@ -467,5 +618,9 @@ module.exports = {
   getAllPatients,
   getSystemMonitoring,
   getRecentActivity,
-  getLatestFeedback
+  getLatestFeedback,
+  getTopDoctors,
+  getKPIMetrics,
+  getEngagementMetrics,
+  getConsultationTrend
 };

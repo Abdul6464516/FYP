@@ -16,7 +16,11 @@ const {
   getAllPatients,
   getSystemMonitoring,
   getRecentActivity,
-  getLatestFeedback
+  getLatestFeedback,
+  getTopDoctors,
+  getKPIMetrics,
+  getEngagementMetrics,
+  getConsultationTrend
 } = require('../controlers/adminController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
@@ -67,5 +71,17 @@ router.get('/monitoring/activity', verifyToken, requireRole('admin'), getRecentA
 
 // System Monitoring - Get latest feedback
 router.get('/monitoring/feedback', verifyToken, requireRole('admin'), getLatestFeedback);
+
+// Analytics - Get top performing doctors
+router.get('/analytics/top-doctors', verifyToken, requireRole('admin'), getTopDoctors);
+
+// Analytics - Get KPI metrics
+router.get('/analytics/kpi-metrics', verifyToken, requireRole('admin'), getKPIMetrics);
+
+// Analytics - Get engagement metrics
+router.get('/analytics/engagement', verifyToken, requireRole('admin'), getEngagementMetrics);
+
+// Analytics - Get consultation trend
+router.get('/analytics/consultation-trend', verifyToken, requireRole('admin'), getConsultationTrend);
 
 module.exports = router;
