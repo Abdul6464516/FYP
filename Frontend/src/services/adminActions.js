@@ -174,3 +174,53 @@ export const getLatestFeedback = async (limit = 10) => {
     throw error.response?.data || { message: 'Failed to fetch latest feedback' };
   }
 };
+
+
+// ========== ANALYTICS FUNCTIONS ==========
+
+// Get top performing doctors
+export const getTopDoctors = async () => {
+  try {
+    const response = await api.get('/admin/analytics/top-doctors');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching top doctors:', error);
+    throw error.response?.data || { message: 'Failed to fetch top doctors' };
+  }
+};
+
+
+// Get KPI metrics (total consultations, new registrations, trends)
+export const getKPIMetrics = async () => {
+  try {
+    const response = await api.get('/admin/analytics/kpi-metrics');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching KPI metrics:', error);
+    throw error.response?.data || { message: 'Failed to fetch KPI metrics' };
+  }
+};
+
+
+// Get engagement metrics (patient retention, app usage, consultation completion)
+export const getEngagementMetrics = async () => {
+  try {
+    const response = await api.get('/admin/analytics/engagement');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching engagement metrics:', error);
+    throw error.response?.data || { message: 'Failed to fetch engagement metrics' };
+  }
+};
+
+
+// Get consultation trend (monthly data for 6 months)
+export const getConsultationTrend = async () => {
+  try {
+    const response = await api.get('/admin/analytics/consultation-trend');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching consultation trend:', error);
+    throw error.response?.data || { message: 'Failed to fetch consultation trend' };
+  }
+};
