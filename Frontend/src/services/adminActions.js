@@ -224,3 +224,93 @@ export const getConsultationTrend = async () => {
     throw error.response?.data || { message: 'Failed to fetch consultation trend' };
   }
 };
+
+// ============ SECURITY & PRIVACY ACTIONS ============
+
+// Get security logs
+export const getSecurityLogs = async () => {
+  try {
+    const response = await api.get('/admin/security/logs');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching security logs:', error);
+    throw error.response?.data || { message: 'Failed to fetch security logs' };
+  }
+};
+
+// Get patient data access records
+export const getPatientDataAccess = async () => {
+  try {
+    const response = await api.get('/admin/security/patient-access');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching patient data access:', error);
+    throw error.response?.data || { message: 'Failed to fetch patient data access' };
+  }
+};
+
+// Get consultation encryption status
+export const getConsultationEncryption = async () => {
+  try {
+    const response = await api.get('/admin/security/consultation-encryption');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching consultation encryption:', error);
+    throw error.response?.data || { message: 'Failed to fetch consultation encryption' };
+  }
+};
+
+// Get data retention policies
+export const getDataRetentionPolicies = async () => {
+  try {
+    const response = await api.get('/admin/security/retention-policies');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data retention policies:', error);
+    throw error.response?.data || { message: 'Failed to fetch data retention policies' };
+  }
+};
+
+// Get pending data deletion requests
+export const getPendingDeletions = async () => {
+  try {
+    const response = await api.get('/admin/security/pending-deletions');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching pending deletions:', error);
+    throw error.response?.data || { message: 'Failed to fetch pending deletions' };
+  }
+};
+
+// Get staff confidentiality compliance
+export const getStaffCompliance = async () => {
+  try {
+    const response = await api.get('/admin/security/staff-compliance');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching staff compliance:', error);
+    throw error.response?.data || { message: 'Failed to fetch staff compliance' };
+  }
+};
+
+// Get patient consent records
+export const getPatientConsent = async () => {
+  try {
+    const response = await api.get('/admin/security/patient-consent');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching patient consent:', error);
+    throw error.response?.data || { message: 'Failed to fetch patient consent' };
+  }
+};
+
+// Approve data deletion request
+export const approveDeletion = async (deletionId) => {
+  try {
+    const response = await api.put(`/admin/security/approve-deletion/${deletionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving deletion:', error);
+    throw error.response?.data || { message: 'Failed to approve deletion' };
+  }
+};

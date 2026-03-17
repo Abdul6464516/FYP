@@ -602,6 +602,170 @@ async function getConsultationTrend(req, res) {
   }
 }
 
+// ============ SECURITY & PRIVACY CONTROLLERS ============
+
+// Get security logs
+async function getSecurityLogs(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const securityLogs = [
+      { id: 1, event: "Database Backup", status: "Success", time: "2 hours ago", ip: "192.168.1.1" },
+      { id: 2, event: "Unauthorized Login Attempt", status: "Blocked", time: "5 hours ago", ip: "45.12.33.102" },
+      { id: 3, event: "Encryption Key Rotated", status: "Success", time: "1 day ago", ip: "Internal System" },
+      { id: 4, event: "Patient Data Exported", status: "Success", time: "3 days ago", ip: "192.168.1.50" },
+      { id: 5, event: "User Access Verified", status: "Success", time: "4 days ago", ip: "192.168.1.75" }
+    ];
+
+    res.json(securityLogs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get patient data access records
+async function getPatientDataAccess(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const patientDataAccess = [
+      { id: 1, staffName: "Dr. Ahmed Hassan", role: "Doctor", recordsAccessed: 45, lastAccess: "30 mins ago", encrypted: true },
+      { id: 2, staffName: "Dr. Fatima Khan", role: "Doctor", recordsAccessed: 23, lastAccess: "2 hours ago", encrypted: true },
+      { id: 3, staffName: "Support Agent", role: "Staff", recordsAccessed: 5, lastAccess: "1 day ago", encrypted: true },
+      { id: 4, staffName: "Dr. Hassan Ali", role: "Doctor", recordsAccessed: 67, lastAccess: "1 hour ago", encrypted: true }
+    ];
+
+    res.json(patientDataAccess);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get consultation encryption status
+async function getConsultationEncryption(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const consultationEncryption = [
+      { id: 1, type: "Video Consultation", encrypted: true, keyStatus: "Active", rotationDate: "2025-12-15", coverage: "100%" },
+      { id: 2, type: "Text Consultation", encrypted: true, keyStatus: "Active", rotationDate: "2025-12-15", coverage: "100%" },
+      { id: 3, type: "Prescription Records", encrypted: true, keyStatus: "Active", rotationDate: "2025-12-15", coverage: "100%" }
+    ];
+
+    res.json(consultationEncryption);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get data retention policies
+async function getDataRetentionPolicies(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const dataRetentionPolicies = [
+      { id: 1, dataType: "Patient Medical Records", retentionDays: 2555, policy: "7 years (per regulations)", status: "Compliant" },
+      { id: 2, dataType: "Consultation Logs", retentionDays: 1095, policy: "3 years", status: "Compliant" },
+      { id: 3, dataType: "Access Audit Logs", retentionDays: 365, policy: "1 year", status: "Compliant" },
+      { id: 4, dataType: "Payment Records", retentionDays: 1825, policy: "5 years (per tax law)", status: "Compliant" }
+    ];
+
+    res.json(dataRetentionPolicies);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get pending data deletion requests
+async function getPendingDeletions(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const pendingDeletions = [
+      { id: 1, patientId: "P10023", reason: "Patient Request", initiatedBy: "Admin", date: "2 days ago", status: "Pending Review" },
+      { id: 2, patientId: "P10024", reason: "Data Retention Policy", initiatedBy: "System", date: "5 days ago", status: "Completed" },
+      { id: 3, patientId: "P10025", reason: "Patient Request", initiatedBy: "Patient", date: "1 day ago", status: "Pending Review" }
+    ];
+
+    res.json(pendingDeletions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get staff confidentiality compliance
+async function getStaffCompliance(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const staffCompliance = [
+      { id: 1, staffName: "Dr. Ahmed Hassan", complianceStatus: "Compliant", privacyAgreement: "Signed", lastTraining: "30 days ago", confidentialityScore: "95%" },
+      { id: 2, staffName: "Dr. Fatima Khan", complianceStatus: "Compliant", privacyAgreement: "Signed", lastTraining: "45 days ago", confidentialityScore: "90%" },
+      { id: 3, staffName: "Support Agent", complianceStatus: "Pending", privacyAgreement: "Pending", lastTraining: "Never", confidentialityScore: "75%" },
+      { id: 4, staffName: "Dr. Hassan Ali", complianceStatus: "Compliant", privacyAgreement: "Signed", lastTraining: "15 days ago", confidentialityScore: "98%" }
+    ];
+
+    res.json(staffCompliance);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Get patient consent records
+async function getPatientConsent(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const patientConsent = [
+      { id: 1, patientId: "P10001", consentType: "Medical Data Sharing", status: "Consented", date: "2025-01-10" },
+      { id: 2, patientId: "P10002", consentType: "Research Participation", status: "Not Consented", date: "N/A" },
+      { id: 3, patientId: "P10003", consentType: "Video Recording", status: "Consented", date: "2025-02-15" },
+      { id: 4, patientId: "P10004", consentType: "Medical Data Sharing", status: "Consented", date: "2025-02-20" }
+    ];
+
+    res.json(patientConsent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Approve data deletion request
+async function approveDeletion(req, res) {
+  try {
+    const adminId = req.user && req.user.id;
+    if (!adminId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { deletionId } = req.params;
+
+    // In a real scenario, this would update the database
+    // For now, return success response
+    res.json({
+      message: 'Deletion request approved successfully',
+      deletionId: deletionId,
+      status: 'Completed',
+      approvedAt: new Date(),
+      approvedBy: adminId
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 module.exports = {
   getAdminProfile,
   updateAdminProfile,
@@ -622,5 +786,13 @@ module.exports = {
   getTopDoctors,
   getKPIMetrics,
   getEngagementMetrics,
-  getConsultationTrend
+  getConsultationTrend,
+  getSecurityLogs,
+  getPatientDataAccess,
+  getConsultationEncryption,
+  getDataRetentionPolicies,
+  getPendingDeletions,
+  getStaffCompliance,
+  getPatientConsent,
+  approveDeletion
 };

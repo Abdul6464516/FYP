@@ -18,6 +18,7 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+app.set('trust proxy', true); // Trust proxy for accurate IP address
 // mount auth routes
 const authRoutes = require('./routes/auth');
 const patientRoutes = require('./routes/patient');
