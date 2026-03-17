@@ -16,6 +16,7 @@ import PrescriptionAccess from "../../Components/Patient/PerscriptionAccess";
 import MedicalRecords from "../../Components/Patient/MedicalRecords";
 import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
 import ProfileDropdown from "../../Components/ProfileDropdown";
+import "./PatientDashboard.css";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -73,29 +74,29 @@ const PatientDashboard = () => {
   const greeting = greetHour < 12 ? "Good Morning" : greetHour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div style={s.page}>
-      {isMobile && sidebarOpen && <div style={s.overlay} onClick={() => setSidebarOpen(false)} />}
+    <div className="pd-page">
+      {isMobile && sidebarOpen && <div className="pd-overlay active" onClick={() => setSidebarOpen(false)} />}
 
       {/* ═══ SIDEBAR ═══ */}
-      <aside style={{ ...s.sidebar, left: sidebarOpen ? 0 : "-280px", width: isMobile ? "260px" : "272px" }}>
+      <aside className={`pd-sidebar ${!sidebarOpen ? 'closed' : ''}`}>
         {/* Brand */}
-        <div style={s.brand}>
-          <div style={s.brandIcon}><Heart size={20} color="#fff" fill="#fff" /></div>
-          <span style={s.brandName}>Telemedicine</span>
+        <div className="pd-brand">
+          <div className="pd-brand-icon"><Heart size={20} color="#fff" fill="#fff" /></div>
+          <span className="pd-brand-name">Telemedicine</span>
         </div>
 
         {/* User card */}
-        <div style={s.userCard}>
-          <div style={s.userAvatar}>{userName.charAt(0).toUpperCase()}</div>
+        <div className="pd-user-card">
+          <div className="pd-user-avatar">{userName.charAt(0).toUpperCase()}</div>
           <div>
-            <div style={s.userFullName}>{userName}</div>
-            <div style={s.userRole}>Patient</div>
+            <div className="pd-user-name">{userName}</div>
+            <div className="pd-user-role">Patient</div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav style={s.nav}>
-          <div style={s.navLabel}>MENU</div>
+        <nav className="pd-nav">
+          <div className="pd-nav-label">MENU</div>
           {menuItems.map((item) => {
             const active = activeTab === item.id;
             return (
@@ -104,17 +105,11 @@ const PatientDashboard = () => {
                 onClick={() => { setActiveTab(item.id); if (isMobile) setSidebarOpen(false); }}
                 onMouseEnter={() => setHovered(item.id)}
                 onMouseLeave={() => setHovered(null)}
-                style={{
-                  ...s.navItem,
-                  backgroundColor: active ? "#f0fdf4" : hovered === item.id ? "#f9fafb" : "transparent",
-                  color: active ? "#16a34a" : "#4b5563",
-                  borderLeft: active ? "3px solid #16a34a" : "3px solid transparent",
-                  fontWeight: active ? "600" : "500",
-                }}
+                className={`pd-nav-item ${active ? 'active' : ''}`}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="pd-nav-icon-text">
                   {item.icon}
-                  <span>{item.label}</span>
+                  <span className="pd-nav-item-label">{item.label}</span>
                 </div>
                 {active && <ChevronRight size={16} color="#16a34a" />}
               </button>
@@ -124,20 +119,20 @@ const PatientDashboard = () => {
       </aside>
 
       {/* ═══ MAIN ═══ */}
-      <div style={{ ...s.main, marginLeft: isMobile ? 0 : sidebarOpen ? "272px" : 0 }}>
+      <div className={`pd-main ${isMobile && !sidebarOpen ? 'sidebar-closed' : ''}`}>
         {/* Header */}
-        <header style={s.header}>
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <button style={s.menuBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
+        <header className="pd-header">
+          <div className="pd-header-left">
+            <button className="pd-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
               {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             <div>
-              <div style={s.greet}>{greeting} 👋</div>
-              <div style={s.greetName}>{userName}</div>
+              <div className="pd-greeting">{greeting} 👋</div>
+              <div className="pd-greeting-name">{userName}</div>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div className="pd-header-right">
             <ProfileDropdown 
               userName={userName} 
               userRole="Patient"
@@ -149,8 +144,8 @@ const PatientDashboard = () => {
         </header>
 
         {/* Content */}
-        <main style={{ padding: isMobile ? "16px" : "28px" }}>
-          <div style={s.contentCard}>
+        <main className="pd-content">
+          <div className="pd-content-card">
             {activeTab === "Profile" && <PatientProfile />}
             {activeTab === "Appointments" && <AppointmentBooking />}
             {activeTab === "Consultation" && (
@@ -164,75 +159,6 @@ const PatientDashboard = () => {
       </div>
     </div>
   );
-};
-
-const s = {
-  page: { display: "flex", minHeight: "100vh", backgroundColor: "#f0f2f5", fontFamily: "'Inter','Segoe UI',system-ui,sans-serif" },
-  overlay: { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.4)", zIndex: 99 },
-
-  /* Sidebar */
-  sidebar: {
-    position: "fixed", height: "100vh", backgroundColor: "#fff",
-    boxShadow: "2px 0 16px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column",
-    zIndex: 100, transition: "left 0.3s cubic-bezier(.4,0,.2,1)", borderRight: "1px solid #f0f0f0",
-  },
-  brand: {
-    display: "flex", alignItems: "center", gap: "10px",
-    padding: "22px 22px 18px",
-  },
-  brandIcon: {
-    width: "36px", height: "36px", borderRadius: "10px",
-    background: "linear-gradient(135deg, #16a34a, #15803d)",
-    display: "flex", alignItems: "center", justifyContent: "center",
-  },
-  brandName: { fontWeight: "800", fontSize: "20px", color: "#111827", letterSpacing: "-0.5px" },
-
-  userCard: {
-    display: "flex", alignItems: "center", gap: "12px",
-    margin: "0 16px 16px", padding: "14px",
-    borderRadius: "14px", backgroundColor: "#f0fdf4", border: "1px solid #dcfce7",
-  },
-  userAvatar: {
-    width: "40px", height: "40px", borderRadius: "50%",
-    background: "linear-gradient(135deg, #16a34a, #0d9488)", color: "#fff",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontWeight: "700", fontSize: "16px", flexShrink: 0,
-  },
-  userFullName: { fontWeight: "600", fontSize: "14px", color: "#111827" },
-  userRole: { fontSize: "11px", color: "#16a34a", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
-
-  nav: { flex: 1, padding: "4px 12px", overflowY: "auto" },
-  navLabel: { fontSize: "10px", fontWeight: "700", color: "#9ca3af", letterSpacing: "1px", padding: "8px 10px 6px", marginTop: "4px" },
-  navItem: {
-    display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
-    padding: "11px 14px", border: "none", borderRadius: "10px", cursor: "pointer",
-    fontSize: "13.5px", transition: "all 0.15s", textAlign: "left", marginBottom: "2px",
-    background: "none",
-  },
-
-  /* Main */
-  main: { flex: 1, transition: "margin 0.3s ease", minWidth: 0 },
-  header: {
-    height: "72px", backgroundColor: "#fff", display: "flex", alignItems: "center",
-    justifyContent: "space-between", padding: "0 28px",
-    position: "sticky", top: 0, zIndex: 90,
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)", borderBottom: "1px solid #f0f0f0",
-  },
-  menuBtn: { border: "none", backgroundColor: "transparent", cursor: "pointer", color: "#4b5563", display: "flex" },
-  greet: { fontSize: "12px", color: "#9ca3af", fontWeight: "500" },
-  greetName: { fontSize: "16px", fontWeight: "700", color: "#111827" },
-  headerAvatar: {
-    width: "38px", height: "38px", borderRadius: "50%",
-    background: "linear-gradient(135deg, #16a34a, #0d9488)", color: "#fff",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontWeight: "700", fontSize: "15px",
-  },
-
-  contentCard: {
-    backgroundColor: "#fff", borderRadius: "16px", padding: "28px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)", border: "1px solid #f0f0f0",
-    minHeight: "78vh",
-  },
 };
 
 export default PatientDashboard;

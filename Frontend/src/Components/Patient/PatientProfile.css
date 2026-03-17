@@ -1,0 +1,255 @@
+/* PatientProfile Responsive Styles */
+
+/* Container/Card Styles */
+.patient-profile-card {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.patient-profile-header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.patient-profile-title {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.patient-profile-subtitle {
+  margin: 5px 0 0;
+  color: #777;
+  font-size: 14px;
+}
+
+/* Form Grid */
+.patient-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.patient-profile-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-profile-label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+}
+
+.patient-profile-input,
+.patient-profile-textarea {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.patient-profile-input:focus,
+.patient-profile-textarea:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.patient-profile-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Button Container and Button */
+.patient-profile-button-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.patient-profile-update-btn {
+  padding: 12px 28px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.patient-profile-update-btn:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(33, 136, 56, 0.3);
+}
+
+.patient-profile-update-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.patient-profile-loading {
+  text-align: center;
+  color: #777;
+  padding: 60px 20px;
+  font-size: 16px;
+}
+
+/* ============================================ */
+/* TABLET STYLES (768px to 1023px) */
+/* ============================================ */
+@media (max-width: 1023px) {
+  .patient-profile-card {
+    padding: 16px;
+  }
+
+  .patient-profile-header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+  }
+
+  .patient-profile-title {
+    font-size: 20px;
+  }
+
+  .patient-profile-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .patient-profile-input,
+  .patient-profile-textarea {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .patient-profile-button-container {
+    margin-top: 24px;
+  }
+
+  .patient-profile-update-btn {
+    padding: 10px 24px;
+    font-size: 15px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE STYLES (Below 768px) */
+/* ============================================ */
+@media (max-width: 767px) {
+  .patient-profile-card {
+    padding: 12px;
+  }
+
+  .patient-profile-header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+
+  .patient-profile-title {
+    font-size: 18px;
+  }
+
+  .patient-profile-subtitle {
+    font-size: 12px;
+  }
+
+  /* Stack grid to single column on mobile */
+  .patient-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Medical History field should span single column on mobile */
+  .patient-profile-medical-history {
+    grid-column: span 1 !important;
+  }
+
+  .patient-profile-label {
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .patient-profile-input,
+  .patient-profile-textarea {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 4px;
+  }
+
+  .patient-profile-textarea {
+    min-height: 80px;
+  }
+
+  .patient-profile-button-container {
+    margin-top: 20px;
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .patient-profile-update-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .patient-profile-update-btn:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ============================================ */
+/* SMALL MOBILE STYLES (Below 480px) */
+/* ============================================ */
+@media (max-width: 479px) {
+  .patient-profile-card {
+    padding: 10px;
+  }
+
+  .patient-profile-header {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+
+  .patient-profile-title {
+    font-size: 16px;
+  }
+
+  .patient-profile-subtitle {
+    font-size: 11px;
+  }
+
+  .patient-profile-grid {
+    gap: 10px;
+  }
+
+  .patient-profile-label {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .patient-profile-input,
+  .patient-profile-textarea {
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  .patient-profile-textarea {
+    min-height: 70px;
+  }
+
+  .patient-profile-update-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}

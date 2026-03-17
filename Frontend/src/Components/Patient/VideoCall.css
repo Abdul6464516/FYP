@@ -1,0 +1,1453 @@
+/* VideoCall Responsive Styles */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ============================================ */
+/* LOADING STATE */
+/* ============================================ */
+.vc-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.vc-loading-container p {
+  margin-top: 10px;
+  color: #6b7280;
+}
+
+/* ============================================ */
+/* RINGING / INCOMING CALL STATE */
+/* ============================================ */
+.vc-ringing-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 16px;
+}
+
+.vc-ringing-card {
+  text-align: center;
+  padding: 40px 30px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  width: 100%;
+  animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vc-ringing-pulse {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 20px rgba(16, 185, 129, 0.15), 0 0 0 40px rgba(16, 185, 129, 0.08);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.vc-ringing-card h2 {
+  color: #1f2937;
+  margin: 20px 0 5px;
+}
+
+.vc-ringing-card p {
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.vc-ringing-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.vc-decline-btn,
+.vc-accept-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 28px;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 110px;
+}
+
+.vc-decline-btn {
+  background-color: #ef4444;
+}
+
+.vc-decline-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.vc-accept-btn {
+  background-color: #10b981;
+}
+
+.vc-accept-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================ */
+/* ACTIVE CALL VIEW */
+/* ============================================ */
+.vc-call-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  background-color: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.vc-remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vc-connecting-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(17, 24, 39, 0.85);
+  z-index: 5;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.vc-connecting-overlay p {
+  color: #fff;
+  font-size: 16px;
+  margin-top: 14px;
+}
+
+.vc-local-video-wrapper {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 170px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  background-color: #000;
+}
+
+.vc-local-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vc-video-off-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.vc-self-label {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  font-size: 11px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.vc-call-info-bar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 14px;
+  border-radius: 20px;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.vc-live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.vc-call-info-bar span {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vc-call-info-bar span.vc-live-meta {
+  color: #d1d5db;
+  font-weight: 400;
+}
+
+.vc-control-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  background-color: rgba(17, 24, 39, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.vc-icon-btn,
+.vc-active-btn,
+.vc-end-call-btn {
+  padding: 14px;
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.vc-icon-btn {
+  background-color: #4b5563;
+}
+
+.vc-icon-btn:hover {
+  background-color: #555a6a;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.vc-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.vc-active-btn {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.vc-active-btn:hover {
+  background-color: #dc2626;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.vc-active-btn:active {
+  transform: scale(0.95);
+}
+
+.vc-end-call-btn {
+  background-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.vc-end-call-btn:hover {
+  background-color: #b91c1c;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4);
+}
+
+.vc-end-call-btn:active {
+  transform: scale(0.95);
+}
+
+.vc-audio-only-banner {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(245, 158, 11, 0.9);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+/* ============================================ */
+/* IDLE / WAITING VIEW */
+/* ============================================ */
+.vc-idle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  min-height: 500px;
+}
+
+.vc-idle-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.vc-idle-icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #ecfdf5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vc-idle-header h2 {
+  color: #1f2937;
+  margin: 0;
+}
+
+.vc-idle-header p {
+  color: #6b7280;
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.vc-idle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ============================================ */
+/* CARD STYLES (Checklist & Bookings) */
+/* ============================================ */
+.vc-card {
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.vc-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.vc-card-title {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.vc-checklist-body {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vc-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vc-check-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #f3f4f6;
+}
+
+.vc-check-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.vc-check-desc {
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Bookings card */
+.vc-bookings-card {
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  padding: 0 0 16px;
+  overflow: hidden;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.vc-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 20px 8px;
+  padding-top: 4px;
+}
+
+.vc-appt-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f9fafb;
+  transition: background 0.15s;
+}
+
+.vc-appt-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.vc-appt-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vc-appt-doctor {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vc-appt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.vc-appt-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.vc-appt-type-pill {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.vc-appt-reason {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 4px 0 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vc-empty-bookings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.vc-empty-bookings p {
+  margin: 0;
+}
+
+.vc-empty-bookings p:first-of-type {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.vc-empty-bookings p:last-of-type {
+  color: #d1d5db;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* ============================================ */
+/* FEEDBACK FORM STATE */
+/* ============================================ */
+.vc-feedback-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 16px;
+}
+
+.vc-feedback-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 500px;
+  width: 100%;
+  padding: 32px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vc-fb-doctor-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background-color: #f0fdf4;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 20px;
+}
+
+.vc-fb-doctor-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #10b981;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.vc-fb-doctor-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.vc-fb-doctor-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.vc-feedback-card h3 {
+  color: #1f2937;
+  margin: 20px 0 8px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.vc-feedback-card > p {
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.vc-fb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.vc-star-rating {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  margin: 18px 0;
+  min-height: 60px;
+  width: 100%;
+}
+
+.vc-stars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.vc-rating-slot {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+}
+
+.vc-star-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.vc-star-btn:hover {
+  transform: scale(1.2);
+  background-color: rgba(251, 191, 36, 0.1);
+}
+
+.vc-star-btn:active {
+  transform: scale(0.95);
+}
+
+.vc-rating-text {
+  margin-left: 0;
+  font-size: 18px;
+  color: #f59e0b;
+  font-weight: 700;
+  min-width: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.vc-fb-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.vc-fb-textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  min-height: 90px;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.vc-fb-textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.vc-fb-button-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.vc-fb-submit-btn,
+.vc-fb-skip-btn,
+.vc-fb-done-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.vc-fb-submit-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #10b981;
+  color: #fff;
+}
+
+.vc-fb-submit-btn:hover:not(:disabled) {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.vc-fb-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vc-fb-skip-btn {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.vc-fb-skip-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.vc-fb-done-btn {
+  margin-top: 16px;
+  background-color: #10b981;
+  color: #fff;
+  width: 100%;
+}
+
+.vc-fb-done-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================ */
+/* TABLET STYLES (768px to 1023px) */
+/* ============================================ */
+@media (max-width: 1023px) {
+  .vc-idle-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .vc-call-container {
+    height: 400px;
+  }
+
+  .vc-local-video-wrapper {
+    width: 120px;
+    height: 90px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .vc-control-bar {
+    height: 70px;
+    gap: 20px;
+  }
+
+  .vc-icon-btn,
+  .vc-active-btn,
+  .vc-end-call-btn {
+    padding: 12px;
+  }
+
+  .vc-ringing-card {
+    padding: 32px 24px;
+  }
+
+  .vc-feedback-card {
+    padding: 24px;
+  }
+
+  .vc-bookings-card {
+    max-height: 380px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE STYLES (Below 768px) */
+/* ============================================ */
+@media (max-width: 767px) {
+  /* Stack layout to single column */
+  .vc-idle-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .vc-idle-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 12px 16px;
+  }
+
+  .vc-idle-icon-circle {
+    width: 50px;
+    height: 50px;
+  }
+
+  .vc-idle-header h2 {
+    font-size: 18px;
+  }
+
+  .vc-idle-header p {
+    font-size: 12px;
+  }
+
+  /* Call container adjustments - INCREASED HEIGHT */
+  .vc-call-container {
+    height: 440px;
+    border-radius: 12px;
+  }
+
+  /* Local video increased size */
+  .vc-local-video-wrapper {
+    width: 120px;
+    height: 90px;
+    top: 12px;
+    right: 12px;
+    border-width: 2px;
+  }
+
+  .vc-call-info-bar {
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    padding: 6px 12px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .vc-call-info-bar span {
+    font-size: 12px;
+  }
+
+  .vc-self-label {
+    font-size: 11px;
+  }
+
+  .vc-control-bar {
+    height: 70px;
+    gap: 12px;
+    padding: 0 8px;
+  }
+
+  .vc-icon-btn,
+  .vc-active-btn,
+  .vc-end-call-btn {
+    padding: 12px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .vc-audio-only-banner {
+    bottom: 80px;
+    font-size: 12px;
+    padding: 6px 12px;
+    white-space: normal;
+    max-width: 90%;
+  }
+
+  /* Ringing - RESPONSIVE */
+  .vc-ringing-container {
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .vc-ringing-card {
+    padding: 28px 20px;
+    border-radius: 16px;
+    max-width: 100%;
+  }
+
+  .vc-ringing-pulse {
+    width: 80px;
+    height: 80px;
+    box-shadow: 0 0 0 16px rgba(16, 185, 129, 0.15), 0 0 0 32px rgba(16, 185, 129, 0.08);
+  }
+
+  .vc-ringing-card h2 {
+    font-size: 18px;
+    margin: 18px 0 8px;
+    line-height: 1.3;
+  }
+
+  .vc-ringing-card p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .vc-ringing-actions {
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .vc-decline-btn,
+  .vc-accept-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+    gap: 5px;
+    flex: 0 1 calc(50% - 8px);
+    min-width: 100px;
+  }
+
+  /* Feedback form - IMPROVED */
+  .vc-feedback-container {
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .vc-feedback-card {
+    padding: 24px 18px;
+    border-radius: 14px;
+    max-width: 100%;
+  }
+
+  .vc-fb-doctor-header {
+    padding: 14px;
+    margin-bottom: 18px;
+    gap: 12px;
+  }
+
+  .vc-fb-doctor-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .vc-fb-doctor-header h3 {
+    font-size: 15px;
+  }
+
+  .vc-fb-doctor-header p {
+    font-size: 12px;
+  }
+
+  .vc-feedback-card h3 {
+    font-size: 18px;
+    margin: 12px 0 6px;
+  }
+
+  .vc-feedback-card > p {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .vc-fb-form {
+    gap: 16px;
+  }
+
+  .vc-star-rating {
+    margin: 12px 0;
+    width: 100%;
+    min-height: auto;
+    column-gap: 10px;
+  }
+
+  .vc-stars {
+    gap: 6px;
+  }
+
+  .vc-star-btn {
+    padding: 0;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .vc-star-btn svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .vc-rating-text {
+    font-size: 14px;
+  }
+
+  .vc-fb-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .vc-fb-textarea {
+    min-height: 80px;
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .vc-fb-button-group {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .vc-fb-submit-btn,
+  .vc-fb-skip-btn {
+    padding: 11px 16px;
+    font-size: 13px;
+  }
+
+  .vc-fb-done-btn {
+    padding: 11px 16px;
+    font-size: 13px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Cards */
+  .vc-card {
+    border-radius: 10px;
+  }
+
+  .vc-card-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .vc-card-title {
+    font-size: 15px;
+  }
+
+  .vc-checklist-body {
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .vc-check-icon-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .vc-check-label {
+    font-size: 13px;
+  }
+
+  .vc-check-desc {
+    font-size: 11px;
+  }
+
+  .vc-bookings-card {
+    max-height: 300px;
+    padding: 0 0 12px;
+  }
+
+  .vc-section-label {
+    font-size: 10px;
+    margin: 0 16px 6px;
+  }
+
+  .vc-appt-item {
+    padding: 8px 16px;
+    gap: 8px;
+  }
+
+  .vc-appt-doctor {
+    font-size: 13px;
+  }
+
+  .vc-appt-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    gap: 3px;
+  }
+
+  .vc-appt-meta {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .vc-appt-reason {
+    font-size: 11px;
+  }
+
+  .vc-empty-bookings {
+    padding: 30px 16px;
+  }
+
+  .vc-empty-bookings p:first-of-type {
+    font-size: 13px;
+  }
+
+  .vc-empty-bookings p:last-of-type {
+    font-size: 11px;
+  }
+
+  /* Loading */
+  .vc-loading-container {
+    min-height: 300px;
+  }
+
+  .vc-connecting-overlay p {
+    font-size: 14px;
+  }
+}
+
+/* ============================================ */
+/* SMALL MOBILE STYLES (Below 480px) */
+/* ============================================ */
+@media (max-width: 479px) {
+  .vc-idle-container {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .vc-idle-header {
+    padding: 8px 10px;
+  }
+
+  .vc-idle-header h2 {
+    font-size: 15px;
+  }
+
+  .vc-idle-header p {
+    font-size: 11px;
+  }
+
+  /* Call container on very small screens */
+  .vc-call-container {
+    height: 380px;
+  }
+
+  .vc-local-video-wrapper {
+    width: 100px;
+    height: 75px;
+    top: 8px;
+    right: 8px;
+    border-width: 2px;
+  }
+
+  .vc-control-bar {
+    height: 65px;
+    gap: 10px;
+  }
+
+  .vc-icon-btn,
+  .vc-active-btn,
+  .vc-end-call-btn {
+    padding: 10px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* Ringing on small phones */
+  .vc-ringing-card {
+    padding: 24px 16px;
+  }
+
+  .vc-ringing-pulse {
+    width: 70px;
+    height: 70px;
+  }
+
+  .vc-ringing-card h2 {
+    font-size: 16px;
+    margin: 14px 0 6px;
+  }
+
+  .vc-ringing-card p {
+    font-size: 12px;
+  }
+
+  .vc-decline-btn,
+  .vc-accept-btn {
+    padding: 10px 18px;
+    font-size: 12px;
+    gap: 4px;
+    flex: 0 1 calc(50% - 6px);
+  }
+
+  /* Feedback on small screens */
+  .vc-feedback-card {
+    padding: 20px 16px;
+  }
+
+  .vc-fb-doctor-header {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .vc-fb-doctor-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .vc-feedback-card h3 {
+    font-size: 16px;
+  }
+
+  .vc-feedback-card > p {
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+
+  .vc-star-rating {
+    min-height: auto;
+    margin: 8px 0;
+    width: 100%;
+    column-gap: 8px;
+  }
+
+  .vc-stars {
+    gap: 5px;
+  }
+
+  .vc-star-btn {
+    padding: 0;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .vc-star-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .vc-rating-text {
+    font-size: 12px;
+  }
+
+  .vc-fb-label {
+    font-size: 11px;
+  }
+
+  .vc-fb-textarea {
+    min-height: 70px;
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .vc-fb-submit-btn,
+  .vc-fb-skip-btn {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .vc-fb-done-btn {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .vc-idle-header p {
+    font-size: 11px;
+  }
+
+  /* Call */
+  .vc-call-container {
+    height: 300px;
+  }
+
+  .vc-local-video-wrapper {
+    width: 85px;
+    height: 65px;
+    top: 8px;
+    right: 8px;
+    border-width: 2px;
+  }
+
+  .vc-call-info-bar {
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .vc-live-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .vc-control-bar {
+    height: 60px;
+    gap: 12px;
+  }
+
+  .vc-icon-btn,
+  .vc-active-btn,
+  .vc-end-call-btn {
+    padding: 8px;
+  }
+
+  .vc-icon-btn svg,
+  .vc-active-btn svg,
+  .vc-end-call-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Ringing */
+  .vc-ringing-card {
+    padding: 20px 12px;
+  }
+
+  .vc-ringing-pulse {
+    width: 70px;
+    height: 70px;
+  }
+
+  .vc-ringing-card h2 {
+    font-size: 16px;
+  }
+
+  .vc-ringing-card p {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .vc-decline-btn,
+  .vc-accept-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  /* Feedback */
+  .vc-feedback-card {
+    padding: 16px;
+  }
+
+  .vc-feedback-card h3 {
+    font-size: 15px;
+  }
+
+  .vc-feedback-card > p {
+    font-size: 12px;
+  }
+
+  .vc-fb-doctor-header {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .vc-fb-doctor-avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .vc-fb-label {
+    font-size: 12px;
+  }
+
+  .vc-fb-textarea {
+    min-height: 60px;
+    font-size: 13px;
+  }
+
+  .vc-fb-button-group {
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .vc-fb-submit-btn,
+  .vc-fb-skip-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  /* Cards */
+  .vc-card-title {
+    font-size: 14px;
+  }
+
+  .vc-check-icon-circle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .vc-checklist-body {
+    padding: 8px 12px;
+  }
+
+  .vc-bookings-card {
+    max-height: 250px;
+  }
+
+  .vc-appt-item {
+    padding: 6px 12px;
+  }
+
+  .vc-appt-doctor {
+    font-size: 12px;
+  }
+
+  .vc-appt-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+
+  .vc-appt-meta {
+    font-size: 10px;
+  }
+}

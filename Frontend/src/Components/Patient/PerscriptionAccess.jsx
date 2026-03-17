@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { useUser } from "../../context/UserContext";
 import { getMyPrescriptions } from "../../services/patientAction";
 import jsPDF from "jspdf";
+import "./PerscriptionAccess.css";
 
 const PrescriptionAccess = () => {
   const { user } = useUser();
@@ -213,39 +214,39 @@ const PrescriptionAccess = () => {
   const DetailModal = ({ rx, onClose }) => {
     if (!rx) return null;
     return (
-      <div style={styles.modalOverlay} onClick={onClose}>
-        <div style={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+      <div className="pa-modal-overlay" onClick={onClose}>
+        <div className="pa-modal-card" onClick={(e) => e.stopPropagation()}>
           {/* Close button */}
-          <button style={styles.modalClose} onClick={onClose}>
+          <button className="pa-modal-close" onClick={onClose}>
             <X size={20} />
           </button>
 
           {/* Header */}
-          <div style={styles.modalHeader}>
-            <div style={styles.modalRxBadge}>℞</div>
+          <div className="pa-modal-header">
+            <div className="pa-modal-rx-badge">℞</div>
             <div>
-              <h2 style={{ margin: 0, fontSize: 20, color: "#1f2937" }}>Prescription Details</h2>
-              <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9ca3af" }}>
+              <h2>Prescription Details</h2>
+              <p>
                 ID: {rx._id?.slice(-8)?.toUpperCase()} · {formatDate(rx.createdAt)}
               </p>
             </div>
           </div>
 
           {/* Doctor & Patient info */}
-          <div style={styles.modalInfoGrid}>
-            <div style={styles.modalInfoBox}>
-              <span style={styles.modalInfoLabel}>
+          <div className="pa-modal-info-grid">
+            <div className="pa-modal-info-box">
+              <span className="pa-modal-info-label">
                 <Stethoscope size={14} /> Prescribed By
               </span>
-              <span style={styles.modalInfoValue}>Dr. {rx.doctor?.fullName}</span>
-              <span style={styles.modalInfoSub}>{rx.doctor?.specialty}</span>
+              <span className="pa-modal-info-value">Dr. {rx.doctor?.fullName}</span>
+              <span className="pa-modal-info-sub">{rx.doctor?.specialty}</span>
             </div>
-            <div style={styles.modalInfoBox}>
-              <span style={styles.modalInfoLabel}>
+            <div className="pa-modal-info-box">
+              <span className="pa-modal-info-label">
                 <User size={14} /> Patient
               </span>
-              <span style={styles.modalInfoValue}>{user?.fullName}</span>
-              <span style={styles.modalInfoSub}>
+              <span className="pa-modal-info-value">{user?.fullName}</span>
+              <span className="pa-modal-info-sub">
                 {[user?.gender, user?.age ? `${user.age} yrs` : null].filter(Boolean).join(" · ")}
               </span>
             </div>
@@ -253,21 +254,21 @@ const PrescriptionAccess = () => {
 
           {/* Diagnosis */}
           {rx.diagnosis && (
-            <div style={styles.modalDiagnosisBox}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.5 }}>
+            <div className="pa-modal-diagnosis-box">
+              <span>
                 Diagnosis
               </span>
-              <p style={{ margin: "4px 0 0", fontSize: 15, fontWeight: 600, color: "#1f2937" }}>{rx.diagnosis}</p>
+              <p>{rx.diagnosis}</p>
             </div>
           )}
 
           {/* Medications */}
-          <div style={{ marginBottom: 18 }}>
+          <div>
             <h4 style={{ margin: "0 0 10px", fontSize: 13, color: "#374151", display: "flex", alignItems: "center", gap: 6 }}>
               <Pill size={15} color="#16a34a" /> Medications ({rx.medications.length})
             </h4>
-            <div style={styles.modalMedTable}>
-              <div style={styles.modalMedHeader}>
+            <div className="pa-modal-med-table">
+              <div className="pa-modal-med-header">
                 <span style={{ flex: 0.3 }}>#</span>
                 <span style={{ flex: 2 }}>Medicine</span>
                 <span style={{ flex: 1 }}>Dosage</span>
@@ -277,8 +278,8 @@ const PrescriptionAccess = () => {
               {rx.medications.map((med, idx) => (
                 <div
                   key={idx}
+                  className="pa-modal-med-row"
                   style={{
-                    ...styles.modalMedRow,
                     backgroundColor: idx % 2 === 0 ? "#fff" : "#f9fafb",
                   }}
                 >
@@ -294,21 +295,21 @@ const PrescriptionAccess = () => {
 
           {/* Instructions */}
           {rx.instructions && (
-            <div style={styles.modalInstructions}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.5 }}>
+            <div className="pa-modal-instructions">
+              <span>
                 <NotepadText size={13} style={{ verticalAlign: "middle", marginRight: 4 }} />
                 Additional Instructions
               </span>
-              <p style={{ margin: "6px 0 0", fontSize: 14, color: "#374151", lineHeight: 1.6 }}>
+              <p>
                 {rx.instructions}
               </p>
             </div>
           )}
 
           {/* Actions */}
-          <div style={styles.modalActions}>
-            <button style={styles.modalSecondaryBtn} onClick={onClose}>Close</button>
-            <button style={styles.modalPrimaryBtn} onClick={() => handleDownloadPdf(rx)}>
+          <div className="pa-modal-actions">
+            <button className="pa-modal-secondary-btn" onClick={onClose}>Close</button>
+            <button className="pa-modal-primary-btn" onClick={() => handleDownloadPdf(rx)}>
               <Download size={16} /> Download PDF
             </button>
           </div>
@@ -320,32 +321,32 @@ const PrescriptionAccess = () => {
   // ── RENDER ──
   if (loading) {
     return (
-      <div style={styles.loadingContainer}>
+      <div className="pa-loading-container">
         <Loader size={36} color="#16a34a" style={{ animation: "spin 1s linear infinite" }} />
-        <p style={{ marginTop: 10, color: "#6b7280" }}>Loading prescriptions...</p>
+        <p>Loading prescriptions...</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
+    <div className="pa-container">
       {/* Header */}
-      <div style={styles.headerBar}>
-        <div style={styles.headerLeft}>
-          <div style={styles.headerIcon}>
+      <div className="pa-header-bar">
+        <div className="pa-header-left">
+          <div className="pa-header-icon">
             <ClipboardList size={24} color="#fff" />
           </div>
           <div>
-            <h2 style={styles.pageTitle}>My Prescriptions</h2>
-            <p style={styles.pageSubtitle}>{prescriptions.length} prescription{prescriptions.length !== 1 ? "s" : ""} from your doctors</p>
+            <h2 className="pa-page-title">My Prescriptions</h2>
+            <p className="pa-page-subtitle">{prescriptions.length} prescription{prescriptions.length !== 1 ? "s" : ""} from your doctors</p>
           </div>
         </div>
-        <div style={styles.searchBox}>
+        <div className="pa-search-box">
           <Search size={17} color="#9ca3af" />
           <input
             type="text"
             placeholder="Search by doctor, diagnosis, or medicine..."
-            style={styles.searchInput}
+            className="pa-search-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -354,33 +355,33 @@ const PrescriptionAccess = () => {
 
       {/* List */}
       {filteredPrescriptions.length === 0 ? (
-        <div style={styles.emptyState}>
+        <div className="pa-empty-state">
           <FileText size={52} color="#d1d5db" />
-          <h3 style={{ color: "#6b7280", margin: "14px 0 4px" }}>
+          <h3>
             {prescriptions.length === 0 ? "No Prescriptions Yet" : "No Results Found"}
           </h3>
-          <p style={{ color: "#9ca3af", fontSize: 14 }}>
+          <p>
             {prescriptions.length === 0
               ? "When a doctor sends you a prescription after consultation, it will appear here."
               : "Try a different search term."}
           </p>
         </div>
       ) : (
-        <div style={styles.list}>
+        <div className="pa-list">
           {filteredPrescriptions.map((rx) => (
-            <div key={rx._id} style={styles.rxCard}>
+            <div key={rx._id} className="pa-rx-card">
               {/* Top row */}
-              <div style={styles.rxTopRow}>
-                <div style={styles.rxDoctorInfo}>
-                  <div style={styles.doctorAvatar}>
+              <div className="pa-rx-top-row">
+                <div className="pa-rx-doctor-info">
+                  <div className="pa-doctor-avatar">
                     {rx.doctor?.fullName?.charAt(0)?.toUpperCase() || "D"}
                   </div>
                   <div>
-                    <h4 style={styles.doctorName}>Dr. {rx.doctor?.fullName || "Doctor"}</h4>
-                    <p style={styles.doctorSpecialty}>{rx.doctor?.specialty || "General Physician"}</p>
+                    <h4 className="pa-doctor-name">Dr. {rx.doctor?.fullName || "Doctor"}</h4>
+                    <p className="pa-doctor-specialty">{rx.doctor?.specialty || "General Physician"}</p>
                   </div>
                 </div>
-                <div style={styles.rxDateBadge}>
+                <div className="pa-rx-date-badge">
                   <Calendar size={13} color="#6b7280" />
                   <span>{formatDate(rx.createdAt)}</span>
                 </div>
@@ -388,20 +389,20 @@ const PrescriptionAccess = () => {
 
               {/* Diagnosis */}
               {rx.diagnosis && (
-                <div style={styles.diagnosisPill}>
+                <div className="pa-diagnosis-pill">
                   <Stethoscope size={14} color="#16a34a" />
                   <span>{rx.diagnosis}</span>
                 </div>
               )}
 
               {/* Medications */}
-              <div style={styles.medSection}>
-                <p style={styles.medSectionTitle}>
+              <div className="pa-med-section">
+                <p className="pa-med-section-title">
                   <Pill size={14} color="#3b82f6" /> {rx.medications.length} Medication{rx.medications.length > 1 ? "s" : ""}
                 </p>
-                <div style={styles.medPillContainer}>
+                <div className="pa-med-pill-container">
                   {rx.medications.map((med, idx) => (
-                    <span key={idx} style={styles.medPill}>
+                    <span key={idx} className="pa-med-pill">
                       {med.name} <span style={{ color: "#9ca3af", fontWeight: 400 }}>· {med.dosage}</span>
                     </span>
                   ))}
@@ -410,19 +411,19 @@ const PrescriptionAccess = () => {
 
               {/* Instructions preview */}
               {rx.instructions && (
-                <p style={styles.instructionsPreview}>
+                <p className="pa-instructions-preview">
                   <NotepadText size={13} color="#9ca3af" style={{ flexShrink: 0, marginTop: 2 }} />
                   {rx.instructions.length > 100 ? rx.instructions.slice(0, 100) + "..." : rx.instructions}
                 </p>
               )}
 
               {/* Actions */}
-              <div style={styles.actionRow}>
-                <button style={styles.viewBtn} onClick={() => setSelectedRx(rx)}>
+              <div className="pa-action-row">
+                <button className="pa-view-btn" onClick={() => setSelectedRx(rx)}>
                   <Eye size={15} /> View Details
                   <ChevronRight size={15} />
                 </button>
-                <button style={styles.downloadBtn} onClick={() => handleDownloadPdf(rx)}>
+                <button className="pa-download-btn" onClick={() => handleDownloadPdf(rx)}>
                   <Download size={15} /> Download PDF
                 </button>
               </div>
@@ -435,356 +436,6 @@ const PrescriptionAccess = () => {
       {selectedRx && <DetailModal rx={selectedRx} onClose={() => setSelectedRx(null)} />}
     </div>
   );
-};
-
-// ─── STYLES ─────────────────────────────────────────────
-const styles = {
-  container: { padding: 4 },
-  loadingContainer: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400 },
-
-  // Header
-  headerBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 22,
-    padding: "18px 22px",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-    flexWrap: "wrap",
-    gap: 14,
-  },
-  headerLeft: { display: "flex", alignItems: "center", gap: 14 },
-  headerIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 12,
-    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  pageTitle: { margin: 0, fontSize: 19, fontWeight: 800, color: "#1f2937" },
-  pageSubtitle: { margin: "2px 0 0", fontSize: 13, color: "#9ca3af" },
-  searchBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "10px 16px",
-    backgroundColor: "#f9fafb",
-    border: "1px solid #e5e7eb",
-    borderRadius: 10,
-    width: 320,
-    maxWidth: "100%",
-  },
-  searchInput: {
-    border: "none",
-    backgroundColor: "transparent",
-    outline: "none",
-    width: "100%",
-    fontSize: 13,
-    fontFamily: "inherit",
-    color: "#374151",
-  },
-
-  // List
-  list: { display: "flex", flexDirection: "column", gap: 16 },
-
-  // Card
-  rxCard: {
-    padding: "22px 24px",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
-    transition: "box-shadow 0.2s",
-  },
-  rxTopRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
-  rxDoctorInfo: { display: "flex", alignItems: "center", gap: 12 },
-  doctorAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: 700,
-    fontSize: 16,
-    flexShrink: 0,
-  },
-  doctorName: { margin: 0, fontSize: 15, fontWeight: 700, color: "#1f2937" },
-  doctorSpecialty: { margin: "2px 0 0", fontSize: 12, color: "#9ca3af" },
-  rxDateBadge: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    fontSize: 12,
-    color: "#6b7280",
-    backgroundColor: "#f9fafb",
-    padding: "5px 12px",
-    borderRadius: 8,
-    border: "1px solid #f3f4f6",
-  },
-  diagnosisPill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "6px 14px",
-    borderRadius: 8,
-    backgroundColor: "#f0fdf4",
-    border: "1px solid #bbf7d0",
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#166534",
-    marginBottom: 14,
-  },
-  medSection: { marginBottom: 12 },
-  medSectionTitle: {
-    margin: "0 0 8px",
-    fontSize: 12,
-    fontWeight: 700,
-    color: "#6b7280",
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-  },
-  medPillContainer: { display: "flex", flexWrap: "wrap", gap: 8 },
-  medPill: {
-    padding: "5px 12px",
-    borderRadius: 8,
-    backgroundColor: "#eff6ff",
-    border: "1px solid #bfdbfe",
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#1e40af",
-  },
-  instructionsPreview: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 6,
-    margin: "0 0 12px",
-    fontSize: 13,
-    color: "#6b7280",
-    lineHeight: 1.5,
-    padding: "8px 12px",
-    backgroundColor: "#fefce8",
-    borderRadius: 8,
-    border: "1px solid #fde68a",
-  },
-  actionRow: {
-    display: "flex",
-    gap: 10,
-    borderTop: "1px solid #f3f4f6",
-    paddingTop: 14,
-  },
-  viewBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "9px 18px",
-    border: "1px solid #e5e7eb",
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#374151",
-    transition: "all 0.2s",
-  },
-  downloadBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "9px 18px",
-    border: "none",
-    borderRadius: 10,
-    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-    color: "#fff",
-    cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 600,
-    boxShadow: "0 2px 6px rgba(22,163,74,0.2)",
-    transition: "all 0.2s",
-  },
-
-  // Empty state
-  emptyState: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "60px 20px",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    border: "1px solid #e5e7eb",
-    textAlign: "center",
-  },
-
-  // ── Modal ──
-  modalOverlay: {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    backdropFilter: "blur(4px)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-    padding: 20,
-  },
-  modalCard: {
-    position: "relative",
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    width: "100%",
-    maxWidth: 640,
-    maxHeight: "90vh",
-    overflowY: "auto",
-    padding: "28px 32px",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-  },
-  modalClose: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    background: "#f3f4f6",
-    border: "none",
-    borderRadius: "50%",
-    width: 36,
-    height: 36,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    color: "#6b7280",
-    transition: "background 0.2s",
-  },
-  modalHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    marginBottom: 22,
-  },
-  modalRxBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 22,
-    fontWeight: 700,
-    fontFamily: "serif",
-    fontStyle: "italic",
-  },
-  modalInfoGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12,
-    marginBottom: 18,
-  },
-  modalInfoBox: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 3,
-    padding: "12px 16px",
-    backgroundColor: "#f9fafb",
-    borderRadius: 10,
-    border: "1px solid #f3f4f6",
-  },
-  modalInfoLabel: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: "#9ca3af",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  },
-  modalInfoValue: { fontSize: 15, fontWeight: 700, color: "#1f2937" },
-  modalInfoSub: { fontSize: 12, color: "#6b7280" },
-  modalDiagnosisBox: {
-    padding: "12px 16px",
-    backgroundColor: "#f0fdf4",
-    borderRadius: 10,
-    border: "1px solid #bbf7d0",
-    marginBottom: 18,
-  },
-  modalMedTable: {
-    borderRadius: 10,
-    border: "1px solid #e5e7eb",
-    overflow: "hidden",
-  },
-  modalMedHeader: {
-    display: "flex",
-    gap: 8,
-    padding: "10px 14px",
-    backgroundColor: "#f0fdf4",
-    fontSize: 11,
-    fontWeight: 700,
-    color: "#166534",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  modalMedRow: {
-    display: "flex",
-    gap: 8,
-    padding: "10px 14px",
-    fontSize: 13,
-    borderTop: "1px solid #f3f4f6",
-  },
-  modalInstructions: {
-    padding: "14px 16px",
-    backgroundColor: "#fefce8",
-    borderRadius: 10,
-    border: "1px solid #fde68a",
-    marginBottom: 18,
-  },
-  modalActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 10,
-    marginTop: 6,
-    paddingTop: 16,
-    borderTop: "1px solid #f3f4f6",
-  },
-  modalSecondaryBtn: {
-    padding: "10px 22px",
-    borderRadius: 10,
-    border: "1px solid #d1d5db",
-    backgroundColor: "#fff",
-    color: "#6b7280",
-    fontWeight: 600,
-    fontSize: 13,
-    cursor: "pointer",
-  },
-  modalPrimaryBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "10px 22px",
-    borderRadius: 10,
-    border: "none",
-    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-    color: "#fff",
-    fontWeight: 600,
-    fontSize: 13,
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(22,163,74,0.2)",
-  },
 };
 
 export default PrescriptionAccess;

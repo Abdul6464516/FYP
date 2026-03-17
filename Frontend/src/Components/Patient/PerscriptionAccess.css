@@ -1,0 +1,866 @@
+/* PrescriptionAccess Responsive Styles */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================ */
+/* CONTAINER & GENERAL */
+/* ============================================ */
+.pa-container {
+  padding: 16px;
+}
+
+.pa-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.pa-loading-container p {
+  margin-top: 10px;
+  color: #6b7280;
+}
+
+/* ============================================ */
+/* HEADER BAR */
+/* ============================================ */
+.pa-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding: 18px 22px;
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.pa-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pa-header-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pa-page-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.pa-page-subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.pa-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  width: 320px;
+  max-width: 100%;
+}
+
+.pa-search-input {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  font-family: inherit;
+  color: #374151;
+}
+
+/* ============================================ */
+/* LIST & CARDS */
+/* ============================================ */
+.pa-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pa-rx-card {
+  padding: 22px 24px;
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s;
+}
+
+.pa-rx-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pa-rx-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pa-rx-doctor-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pa-doctor-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.pa-doctor-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.pa-doctor-specialty {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.pa-rx-date-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  background-color: #f9fafb;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+
+.pa-diagnosis-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 14px;
+}
+
+.pa-med-section {
+  margin-bottom: 12px;
+}
+
+.pa-med-section-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pa-med-pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pa-med-pill {
+  padding: 5px 12px;
+  border-radius: 8px;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.pa-instructions-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  padding: 8px 12px;
+  background-color: #fefce8;
+  border-radius: 8px;
+  border: 1px solid #fde68a;
+}
+
+.pa-action-row {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 14px;
+}
+
+.pa-view-btn,
+.pa-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pa-view-btn {
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  color: #374151;
+}
+
+.pa-view-btn:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.pa-download-btn {
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+}
+
+.pa-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* ============================================ */
+/* EMPTY STATE */
+/* ============================================ */
+.pa-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background-color: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.pa-empty-state h3 {
+  color: #6b7280;
+  margin: 14px 0 4px;
+}
+
+.pa-empty-state p {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* ============================================ */
+/* MODAL / DETAIL DIALOG */
+/* ============================================ */
+.pa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.pa-modal-card {
+  position: relative;
+  background-color: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.pa-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.pa-modal-close:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.pa-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-right: 28px;
+}
+
+.pa-modal-rx-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: serif;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.pa-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.pa-modal-header p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.pa-modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.pa-modal-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 16px;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
+}
+
+.pa-modal-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pa-modal-info-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.pa-modal-info-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.pa-modal-diagnosis-box {
+  padding: 12px 16px;
+  background-color: #f0fdf4;
+  border-radius: 10px;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 18px;
+}
+
+.pa-modal-med-table {
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.pa-modal-med-header {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: #f0fdf4;
+  font-size: 11px;
+  font-weight: 700;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pa-modal-med-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.pa-modal-instructions {
+  padding: 14px 16px;
+  background-color: #fefce8;
+  border-radius: 10px;
+  border: 1px solid #fde68a;
+  margin-bottom: 18px;
+}
+
+.pa-modal-instructions span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pa-modal-instructions p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.pa-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.pa-modal-secondary-btn,
+.pa-modal-primary-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pa-modal-secondary-btn {
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  color: #6b7280;
+}
+
+.pa-modal-secondary-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pa-modal-primary-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+}
+
+.pa-modal-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* ============================================ */
+/* TABLET STYLES (768px to 1023px) */
+/* ============================================ */
+@media (max-width: 1023px) {
+  .pa-header-bar {
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .pa-search-box {
+    width: 280px;
+  }
+
+  .pa-rx-card {
+    padding: 18px 20px;
+  }
+
+  .pa-header-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pa-page-title {
+    font-size: 17px;
+  }
+
+  .pa-view-btn,
+  .pa-download-btn {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+
+  .pa-modal-card {
+    padding: 20px 24px;
+  }
+
+  .pa-modal-close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pa-modal-header {
+    gap: 12px;
+  }
+
+  .pa-modal-rx-badge {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE STYLES (Below 768px) */
+/* ============================================ */
+@media (max-width: 767px) {
+  .pa-container {
+    padding: 12px;
+  }
+
+  .pa-header-bar {
+    flex-direction: column;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .pa-header-left {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .pa-header-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .pa-page-title {
+    font-size: 16px;
+  }
+
+  .pa-page-subtitle {
+    font-size: 12px;
+  }
+
+  .pa-search-box {
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  .pa-search-input {
+    font-size: 12px;
+  }
+
+  .pa-rx-card {
+    padding: 16px 18px;
+  }
+
+  .pa-rx-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .pa-rx-date-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .pa-doctor-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .pa-doctor-name {
+    font-size: 13px;
+  }
+
+  .pa-doctor-specialty {
+    font-size: 11px;
+  }
+
+  .pa-med-section-title {
+    font-size: 11px;
+  }
+
+  .pa-med-pill {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .pa-instructions-preview {
+    font-size: 12px;
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .pa-action-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pa-view-btn,
+  .pa-download-btn {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  .pa-empty-state {
+    padding: 40px 16px;
+  }
+
+  /* Modal on mobile */
+  .pa-modal-overlay {
+    padding: 12px;
+  }
+
+  .pa-modal-card {
+    padding: 16px 18px;
+    border-radius: 14px;
+    max-height: 95vh;
+  }
+
+  .pa-modal-close {
+    width: 32px;
+    height: 32px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .pa-modal-header {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .pa-modal-rx-badge {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .pa-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .pa-modal-header p {
+    font-size: 11px;
+  }
+
+  .pa-modal-info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .pa-modal-info-box {
+    padding: 10px 14px;
+  }
+
+  .pa-modal-info-label {
+    font-size: 10px;
+  }
+
+  .pa-modal-info-value {
+    font-size: 14px;
+  }
+
+  .pa-modal-info-sub {
+    font-size: 11px;
+  }
+
+  .pa-modal-med-header {
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+
+  .pa-modal-med-row {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .pa-modal-instructions {
+    padding: 10px 12px;
+  }
+
+  .pa-modal-instructions p {
+    font-size: 13px;
+  }
+
+  .pa-modal-actions {
+    gap: 8px;
+    flex-direction: column-reverse;
+  }
+
+  .pa-modal-secondary-btn,
+  .pa-modal-primary-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .pa-modal-primary-btn {
+    justify-content: center;
+  }
+}
+
+/* ============================================ */
+/* SMALL MOBILE STYLES (Below 480px) */
+/* ============================================ */
+@media (max-width: 479px) {
+  .pa-container {
+    padding: 10px;
+  }
+
+  .pa-header-bar {
+    padding: 10px 12px;
+  }
+
+  .pa-header-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pa-page-title {
+    font-size: 15px;
+  }
+
+  .pa-rx-card {
+    padding: 14px 14px;
+  }
+
+  .pa-doctor-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .pa-doctor-name {
+    font-size: 12px;
+  }
+
+  .pa-diagnosis-pill {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .pa-med-pill {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .pa-view-btn,
+  .pa-download-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .pa-modal-card {
+    padding: 14px 14px;
+  }
+
+  .pa-modal-rx-badge {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .pa-modal-header {
+    margin-bottom: 12px;
+  }
+
+  .pa-modal-header h2 {
+    font-size: 16px;
+  }
+
+  .pa-modal-info-label {
+    font-size: 9px;
+  }
+
+  .pa-modal-info-value {
+    font-size: 13px;
+  }
+
+  .pa-modal-med-row {
+    font-size: 11px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .pa-modal-actions {
+    gap: 6px;
+  }
+
+  .pa-modal-secondary-btn,
+  .pa-modal-primary-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}

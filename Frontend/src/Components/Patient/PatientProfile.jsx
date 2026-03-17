@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { getPatientProfile, updatePatientProfile } from '../../services/patientAction';
 import { useUser } from '../../context/UserContext';
+import './PatientProfile.css';
 
 const PatientProfile = () => {
   const { updateUserContext } = useUser();
@@ -92,56 +93,56 @@ const PatientProfile = () => {
 
   if (loading) {
     return (
-      <div style={formStyles.card}>
-        <p style={{ textAlign: 'center', color: '#777', padding: '40px 0' }}>Loading profile...</p>
+      <div className="patient-profile-card">
+        <p className="patient-profile-loading">Loading profile...</p>
       </div>
     );
   }
 
   return (
-    <div style={formStyles.card}>
-      <div style={formStyles.header}>
-        <h2 style={formStyles.title}>Your Medical Profile</h2>
-        <p style={formStyles.subtitle}>View and update your information below.</p>
+    <div className="patient-profile-card">
+      <div className="patient-profile-header">
+        <h2 className="patient-profile-title">Your Medical Profile</h2>
+        <p className="patient-profile-subtitle">View and update your information below.</p>
       </div>
 
       <form onSubmit={handleUpdate}>
-        <div style={formStyles.grid}>
+        <div className="patient-profile-grid">
           {/* Name Field */}
-          <div style={formStyles.field}>
-            <label style={formStyles.label}>Full Name</label>
+          <div className="patient-profile-field">
+            <label className="patient-profile-label">Full Name</label>
             <input
               type="text"
               name="fullName"
               value={profile.fullName}
               onChange={handleChange}
-              style={formStyles.input}
+              className="patient-profile-input"
               required
               placeholder="Enter full name"
             />
           </div>
 
           {/* Age Field */}
-          <div style={formStyles.field}>
-            <label style={formStyles.label}>Age</label>
+          <div className="patient-profile-field">
+            <label className="patient-profile-label">Age</label>
             <input
               type="number"
               name="age"
               value={profile.age}
               onChange={handleChange}
-              style={formStyles.input}
+              className="patient-profile-input"
               placeholder="Enter age"
             />
           </div>
 
           {/* Gender Field */}
-          <div style={formStyles.field}>
-            <label style={formStyles.label}>Gender</label>
+          <div className="patient-profile-field">
+            <label className="patient-profile-label">Gender</label>
             <select
               name="gender"
               value={profile.gender}
               onChange={handleChange}
-              style={formStyles.input}
+              className="patient-profile-input"
             >
               <option value="">Select Gender</option>
               <option value="male">Male</option>
@@ -151,40 +152,36 @@ const PatientProfile = () => {
           </div>
 
           {/* Contact Field */}
-          <div style={formStyles.field}>
-            <label style={formStyles.label}>Contact Number</label>
+          <div className="patient-profile-field">
+            <label className="patient-profile-label">Contact Number</label>
             <input
               type="tel"
               name="phone"
               value={profile.phone}
               onChange={handleChange}
-              style={formStyles.input}
+              className="patient-profile-input"
               placeholder="+92 3xx xxxxxxx"
             />
           </div>
 
           {/* Medical History Field */}
-          <div style={{ ...formStyles.field, gridColumn: 'span 2' }}>
-            <label style={formStyles.label}>Medical History</label>
+          <div className="patient-profile-field patient-profile-medical-history">
+            <label className="patient-profile-label">Medical History</label>
             <textarea
               name="medicalHistory"
               value={profile.medicalHistory}
               onChange={handleChange}
-              style={{ ...formStyles.input, height: '100px', resize: 'vertical' }}
+              className="patient-profile-textarea"
               placeholder="Any allergies, previous surgeries, or chronic conditions..."
             />
           </div>
         </div>
 
-        <div style={formStyles.buttonContainer}>
+        <div className="patient-profile-button-container">
           <button
             type="submit"
             disabled={!hasChanges || saving}
-            style={{
-              ...formStyles.updateBtn,
-              opacity: !hasChanges || saving ? 0.5 : 1,
-              cursor: !hasChanges || saving ? 'not-allowed' : 'pointer',
-            }}
+            className="patient-profile-update-btn"
           >
             {saving ? 'Updating...' : 'Update Profile'}
           </button>
@@ -192,19 +189,6 @@ const PatientProfile = () => {
       </form>
     </div>
   );
-};
-
-const formStyles = {
-  card: { padding: '20px' },
-  header: { marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '10px' },
-  title: { margin: 0, color: '#333', fontSize: '22px' },
-  subtitle: { margin: '5px 0 0', color: '#777', fontSize: '14px' },
-  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' },
-  field: { display: 'flex', flexDirection: 'column' },
-  label: { marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#555' },
-  input: { padding: '10px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '15px', outline: 'none' },
-  buttonContainer: { marginTop: '30px', display: 'flex', justifyContent: 'flex-end' },
-  updateBtn: { padding: '12px 25px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', transition: 'opacity 0.2s' },
 };
 
 export default PatientProfile;
