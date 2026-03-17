@@ -81,9 +81,8 @@ function getClientIP(req) {
 
 async function login(req, res) {
   try {
-    const { identifier, password } = req.body; // identifier can be email or username
+    const { identifier, password } = req.body; 
     if (!identifier || !password) return res.status(400).json({ message: 'Missing credentials' });
-    
     const user = await User.findOne({ $or: [{ email: identifier }, { username: identifier }] });
     if (!user) {
       // Log failed login attempt
@@ -200,7 +199,6 @@ async function getLocationFromIP(ipAddress) {
           'User-Agent': 'NodeJS-App'
         }
       });
-
       if (response.data && response.data.status === 'success') {
         return {
           country: response.data.country || 'Unknown',
