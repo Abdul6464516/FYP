@@ -13,7 +13,22 @@ const {
   rejectUser,
   getVerifiedUsersByRole,
   getAllDoctors,
-  getAllPatients
+  getAllPatients,
+  getSystemMonitoring,
+  getRecentActivity,
+  getLatestFeedback,
+  getTopDoctors,
+  getKPIMetrics,
+  getEngagementMetrics,
+  getConsultationTrend,
+  getSecurityLogs,
+  getPatientDataAccess,
+  getConsultationEncryption,
+  getDataRetentionPolicies,
+  getPendingDeletions,
+  getStaffCompliance,
+  getPatientConsent,
+  approveDeletion
 } = require('../controlers/adminController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
@@ -55,5 +70,52 @@ router.get('/verification/all-doctors', verifyToken, requireRole('admin'), getAl
 
 // Get all patients with all verification statuses (requires authentication and admin role)
 router.get('/verification/all-patients', verifyToken, requireRole('admin'), getAllPatients);
+
+// System Monitoring - Get live statistics
+router.get('/monitoring/statistics', verifyToken, requireRole('admin'), getSystemMonitoring);
+
+// System Monitoring - Get recent activity feed
+router.get('/monitoring/activity', verifyToken, requireRole('admin'), getRecentActivity);
+
+// System Monitoring - Get latest feedback
+router.get('/monitoring/feedback', verifyToken, requireRole('admin'), getLatestFeedback);
+
+// Analytics - Get top performing doctors
+router.get('/analytics/top-doctors', verifyToken, requireRole('admin'), getTopDoctors);
+
+// Analytics - Get KPI metrics
+router.get('/analytics/kpi-metrics', verifyToken, requireRole('admin'), getKPIMetrics);
+
+// Analytics - Get engagement metrics
+router.get('/analytics/engagement', verifyToken, requireRole('admin'), getEngagementMetrics);
+
+// Analytics - Get consultation trend
+router.get('/analytics/consultation-trend', verifyToken, requireRole('admin'), getConsultationTrend);
+
+// ============ SECURITY & PRIVACY ENDPOINTS ============
+
+// Get security logs
+router.get('/security/logs', verifyToken, requireRole('admin'), getSecurityLogs);
+
+// Get patient data access records
+router.get('/security/patient-access', verifyToken, requireRole('admin'), getPatientDataAccess);
+
+// Get consultation encryption status
+router.get('/security/consultation-encryption', verifyToken, requireRole('admin'), getConsultationEncryption);
+
+// Get data retention policies
+router.get('/security/retention-policies', verifyToken, requireRole('admin'), getDataRetentionPolicies);
+
+// Get pending data deletion requests
+router.get('/security/pending-deletions', verifyToken, requireRole('admin'), getPendingDeletions);
+
+// Approve data deletion
+router.put('/security/approve-deletion/:deletionId', verifyToken, requireRole('admin'), approveDeletion);
+
+// Get staff confidentiality compliance records
+router.get('/security/staff-compliance', verifyToken, requireRole('admin'), getStaffCompliance);
+
+// Get patient consent records
+router.get('/security/patient-consent', verifyToken, requireRole('admin'), getPatientConsent);
 
 module.exports = router;

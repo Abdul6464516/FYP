@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   User, Calendar, Video, FileText, ClipboardList, Star,
-  LogOut, Menu, X, Heart, ChevronRight, Bell,
+  Menu, X, Heart, ChevronRight, Bell,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { clearSession } from "../../services/auth";
@@ -15,6 +15,7 @@ import AppointmentBooking from "../../Components/Patient/AppointmentBooking";
 import PrescriptionAccess from "../../Components/Patient/PerscriptionAccess";
 import MedicalRecords from "../../Components/Patient/MedicalRecords";
 import FeedbackSystem from "../../Components/Patient/FeedbackSystem";
+import ProfileDropdown from "../../Components/ProfileDropdown";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -53,6 +54,10 @@ const PatientDashboard = () => {
     clearSession();
     if (logoutUser) logoutUser();
     navigate("/login");
+  };
+
+  const handleProfileClick = () => {
+    setActiveTab("Profile");
   };
 
   const menuItems = [
@@ -116,11 +121,6 @@ const PatientDashboard = () => {
             );
           })}
         </nav>
-
-        {/* Logout */}
-        <button style={s.logoutBtn} onClick={handleLogout}>
-          <LogOut size={18} /> <span>Logout</span>
-        </button>
       </aside>
 
       {/* ═══ MAIN ═══ */}
@@ -138,7 +138,13 @@ const PatientDashboard = () => {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={s.headerAvatar}>{userName.charAt(0).toUpperCase()}</div>
+            <ProfileDropdown 
+              userName={userName} 
+              userRole="Patient"
+              onLogout={handleLogout}
+              onProfile={handleProfileClick}
+              avatarIcon={<User size={18} color="#fff" />}
+            />
           </div>
         </header>
 
@@ -202,13 +208,6 @@ const s = {
     padding: "11px 14px", border: "none", borderRadius: "10px", cursor: "pointer",
     fontSize: "13.5px", transition: "all 0.15s", textAlign: "left", marginBottom: "2px",
     background: "none",
-  },
-
-  logoutBtn: {
-    display: "flex", alignItems: "center", gap: "10px",
-    padding: "18px 24px", border: "none", backgroundColor: "transparent",
-    color: "#ef4444", cursor: "pointer", fontWeight: "600", fontSize: "14px",
-    borderTop: "1px solid #f3f4f6",
   },
 
   /* Main */

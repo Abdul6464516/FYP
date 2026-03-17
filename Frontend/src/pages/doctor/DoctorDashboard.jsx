@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UserCheck, Users, Calendar, Video, ClipboardList, Settings,
-  LogOut, Menu, X, FileText, Bell, Heart, ChevronRight, Stethoscope,
+  Menu, X, FileText, Bell, Heart, ChevronRight, Stethoscope,
 } from "lucide-react";
 import { clearSession } from "../../services/auth";
 import { useUser } from "../../context/UserContext";
@@ -16,6 +16,7 @@ import PrescriptionGeneration from "../../Components/Doctor/PrescriptionGenerati
 import MedicalReports from "../../Components/Doctor/MedicalReports";
 import NotificationCenter from "../../Components/Doctor/NotificationCenter";
 import DoctorSettings from "../../Components/Doctor/DoctorSettings";
+import ProfileDropdown from "../../Components/ProfileDropdown";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -57,6 +58,10 @@ const DoctorDashboard = () => {
     clearSession();
     logoutUser();
     navigate("/login");
+  };
+
+  const handleProfileClick = () => {
+    setActiveTab("Profile");
   };
 
   const menuItems = [
@@ -121,10 +126,6 @@ const DoctorDashboard = () => {
             );
           })}
         </nav>
-
-        <button style={s.logoutBtn} onClick={handleLogout}>
-          <LogOut size={18} /> <span>Logout</span>
-        </button>
       </aside>
 
       {/* ═══ MAIN ═══ */}
@@ -150,7 +151,13 @@ const DoctorDashboard = () => {
               <Bell size={21} color="#4b5563" />
               {unreadNotifications > 0 && <span style={s.badge}>{unreadNotifications}</span>}
             </button>
-            <div style={s.headerAvatar}><Stethoscope size={18} color="#fff" /></div>
+            <ProfileDropdown 
+              userName={`Dr. ${drName.split(/[0-9]/)[0]}`} 
+              userRole="Doctor"
+              onLogout={handleLogout}
+              onProfile={handleProfileClick}
+              avatarIcon={<Stethoscope size={18} color="#fff" />}
+            />
           </div>
         </header>
 
@@ -213,13 +220,6 @@ const s = {
     padding: "11px 14px", border: "none", borderRadius: "10px", cursor: "pointer",
     fontSize: "13.5px", transition: "all 0.15s", textAlign: "left", marginBottom: "2px",
     background: "none",
-  },
-
-  logoutBtn: {
-    display: "flex", alignItems: "center", gap: "10px",
-    padding: "18px 24px", border: "none", backgroundColor: "transparent",
-    color: "#ef4444", cursor: "pointer", fontWeight: "600", fontSize: "14px",
-    borderTop: "1px solid #f3f4f6",
   },
 
   main: { flex: 1, transition: "margin 0.3s ease", minWidth: 0 },

@@ -136,3 +136,181 @@ export const getAllPatients = async () => {
     throw error.response?.data || { message: 'Failed to fetch all patients' };
   }
 };
+
+
+// ========== SYSTEM MONITORING FUNCTIONS ==========
+
+// Get system monitoring statistics
+export const getSystemMonitoring = async () => {
+  try {
+    const response = await api.get('/admin/monitoring/statistics');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching system monitoring stats:', error);
+    throw error.response?.data || { message: 'Failed to fetch system monitoring statistics' };
+  }
+};
+
+
+// Get recent activity feed
+export const getRecentActivity = async () => {
+  try {
+    const response = await api.get('/admin/monitoring/activity');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    throw error.response?.data || { message: 'Failed to fetch recent activity' };
+  }
+};
+
+
+// Get latest feedback
+export const getLatestFeedback = async (limit = 10) => {
+  try {
+    const response = await api.get(`/admin/monitoring/feedback?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching latest feedback:', error);
+    throw error.response?.data || { message: 'Failed to fetch latest feedback' };
+  }
+};
+
+
+// ========== ANALYTICS FUNCTIONS ==========
+
+// Get top performing doctors
+export const getTopDoctors = async () => {
+  try {
+    const response = await api.get('/admin/analytics/top-doctors');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching top doctors:', error);
+    throw error.response?.data || { message: 'Failed to fetch top doctors' };
+  }
+};
+
+
+// Get KPI metrics (total consultations, new registrations, trends)
+export const getKPIMetrics = async () => {
+  try {
+    const response = await api.get('/admin/analytics/kpi-metrics');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching KPI metrics:', error);
+    throw error.response?.data || { message: 'Failed to fetch KPI metrics' };
+  }
+};
+
+
+// Get engagement metrics (patient retention, app usage, consultation completion)
+export const getEngagementMetrics = async () => {
+  try {
+    const response = await api.get('/admin/analytics/engagement');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching engagement metrics:', error);
+    throw error.response?.data || { message: 'Failed to fetch engagement metrics' };
+  }
+};
+
+
+// Get consultation trend (monthly data for 6 months)
+export const getConsultationTrend = async () => {
+  try {
+    const response = await api.get('/admin/analytics/consultation-trend');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching consultation trend:', error);
+    throw error.response?.data || { message: 'Failed to fetch consultation trend' };
+  }
+};
+
+// ============ SECURITY & PRIVACY ACTIONS ============
+
+// Get security logs
+export const getSecurityLogs = async () => {
+  try {
+    const response = await api.get('/admin/security/logs');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching security logs:', error);
+    throw error.response?.data || { message: 'Failed to fetch security logs' };
+  }
+};
+
+// Get patient data access records
+export const getPatientDataAccess = async () => {
+  try {
+    const response = await api.get('/admin/security/patient-access');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching patient data access:', error);
+    throw error.response?.data || { message: 'Failed to fetch patient data access' };
+  }
+};
+
+// Get consultation encryption status
+export const getConsultationEncryption = async () => {
+  try {
+    const response = await api.get('/admin/security/consultation-encryption');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching consultation encryption:', error);
+    throw error.response?.data || { message: 'Failed to fetch consultation encryption' };
+  }
+};
+
+// Get data retention policies
+export const getDataRetentionPolicies = async () => {
+  try {
+    const response = await api.get('/admin/security/retention-policies');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data retention policies:', error);
+    throw error.response?.data || { message: 'Failed to fetch data retention policies' };
+  }
+};
+
+// Get pending data deletion requests
+export const getPendingDeletions = async () => {
+  try {
+    const response = await api.get('/admin/security/pending-deletions');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching pending deletions:', error);
+    throw error.response?.data || { message: 'Failed to fetch pending deletions' };
+  }
+};
+
+// Get staff confidentiality compliance
+export const getStaffCompliance = async () => {
+  try {
+    const response = await api.get('/admin/security/staff-compliance');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching staff compliance:', error);
+    throw error.response?.data || { message: 'Failed to fetch staff compliance' };
+  }
+};
+
+// Get patient consent records
+export const getPatientConsent = async () => {
+  try {
+    const response = await api.get('/admin/security/patient-consent');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching patient consent:', error);
+    throw error.response?.data || { message: 'Failed to fetch patient consent' };
+  }
+};
+
+// Approve data deletion request
+export const approveDeletion = async (deletionId) => {
+  try {
+    const response = await api.put(`/admin/security/approve-deletion/${deletionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving deletion:', error);
+    throw error.response?.data || { message: 'Failed to approve deletion' };
+  }
+};

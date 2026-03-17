@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShieldCheck, Users, Activity, Lock, BarChart3,
-  LogOut, Menu, X, UserCog, Heart, ChevronRight,
+  Menu, X, UserCog, Heart, ChevronRight,
 } from "lucide-react";
 import { clearSession } from "../../services/auth";
 import { useUser } from "../../context/UserContext";
@@ -12,6 +12,7 @@ import UserManagement from "../../Components/Admin/UserManagement";
 import SystemMonitoring from "../../Components/Admin/SystemMonitoring";
 import SecurityPrivacy from "../../Components/Admin/SecurityPrivacy";
 import ReportsAnalytics from "../../Components/Admin/ReportsAnalytics";
+import ProfileDropdown from "../../Components/ProfileDropdown";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -38,6 +39,10 @@ const AdminDashboard = () => {
     clearSession();
     if (logoutUser) logoutUser();
     navigate("/login");
+  };
+
+  const handleProfileClick = () => {
+    setActiveTab("Admin Profile");
   };
 
   const menuItems = [
@@ -101,10 +106,6 @@ const AdminDashboard = () => {
             );
           })}
         </nav>
-
-        <button style={s.logoutBtn} onClick={handleLogout}>
-          <LogOut size={18} /> <span>Logout</span>
-        </button>
       </aside>
 
       {/* ═══ MAIN ═══ */}
@@ -124,7 +125,13 @@ const AdminDashboard = () => {
             <div style={!isMobile ? s.roleChip : { display: "none" }}>
               <ShieldCheck size={14} /> Admin
             </div>
-            <div style={s.headerAvatar}><ShieldCheck size={18} color="#fff" /></div>
+            <ProfileDropdown 
+              userName={adminName} 
+              userRole="Admin"
+              onLogout={handleLogout}
+              onProfile={handleProfileClick}
+              avatarIcon={<ShieldCheck size={18} color="#fff" />}
+            />
           </div>
         </header>
 
@@ -180,13 +187,6 @@ const s = {
     padding: "11px 14px", border: "none", borderRadius: "10px", cursor: "pointer",
     fontSize: "13.5px", transition: "all 0.15s", textAlign: "left", marginBottom: "2px",
     background: "none",
-  },
-
-  logoutBtn: {
-    display: "flex", alignItems: "center", gap: "10px",
-    padding: "18px 24px", border: "none", backgroundColor: "transparent",
-    color: "#ef4444", cursor: "pointer", fontWeight: "600", fontSize: "14px",
-    borderTop: "1px solid #f3f4f6",
   },
 
   main: { flex: 1, transition: "margin 0.3s ease", minWidth: 0 },
