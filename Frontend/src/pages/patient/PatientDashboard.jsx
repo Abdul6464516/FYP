@@ -66,8 +66,6 @@ const PatientDashboard = () => {
     { id: "Appointments", icon: <Calendar size={20} />, label: "Book Appointment" },
     { id: "Consultation", icon: <Video size={20} />, label: "Video Consultation" },
     { id: "Prescriptions", icon: <FileText size={20} />, label: "Prescriptions" },
-    { id: "Records", icon: <ClipboardList size={20} />, label: "Medical Records" },
-    { id: "Feedback", icon: <Star size={20} />, label: "Feedback" },
   ];
 
   const greetHour = new Date().getHours();
@@ -126,8 +124,8 @@ const PatientDashboard = () => {
           </div>
 
           <div className="pd-header-right">
-            <ProfileDropdown 
-              userName={userName} 
+            <ProfileDropdown
+              userName={userName}
               userRole="Patient"
               onLogout={handleLogout}
               onProfile={handleProfileClick}

@@ -77,8 +77,7 @@ const DoctorDashboard = () => {
     { id: "Patients", icon: <Users size={20} />, label: "Patient History" },
     { id: "Consultation", icon: <Video size={20} />, label: "Video Consult" },
     { id: "Prescription", icon: <FileText size={20} />, label: "Prescription" },
-    { id: "Reports", icon: <ClipboardList size={20} />, label: "Medical Reports" },
-    { id: "Settings", icon: <Settings size={20} />, label: "Settings" },
+
   ];
 
   const greetHour = new Date().getHours();
@@ -138,8 +137,8 @@ const DoctorDashboard = () => {
               <Bell size={21} color="#4b5563" />
               {unreadNotifications > 0 && <span className="doctor-dashboard-badge">{unreadNotifications}</span>}
             </button>
-            <ProfileDropdown 
-              userName={`Dr. ${drName.split(/[0-9]/)[0]}`} 
+            <ProfileDropdown
+              userName={`Dr. ${drName.split(/[0-9]/)[0]}`}
               userRole="Doctor"
               onLogout={handleLogout}
               onProfile={handleProfileClick}
