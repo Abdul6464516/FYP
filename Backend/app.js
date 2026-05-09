@@ -18,9 +18,7 @@ const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
 
-app.use(cors({
-  origin: "https://abdul-telemedicine-fyp-vu.onrender.com"
-}));
+app.use(cors());
 app.use(express.json());
 app.set('trust proxy', true); // Trust proxy for accurate IP address
 // mount auth routes
