@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { 
-  Activity, Video, Calendar, MessageSquare, 
-  TrendingUp, Users, CheckCircle, Clock, AlertCircle 
+import {
+  Activity, Video, Calendar, MessageSquare,
+  TrendingUp, Users, CheckCircle, Clock, AlertCircle
 } from "lucide-react";
 import { getSystemMonitoring, getRecentActivity, getLatestFeedback } from "../../services/adminActions";
 import "./SystemMonitoring.css";
@@ -34,33 +34,33 @@ const SystemMonitoring = () => {
 
       // Format stats with icons and colors
       const formattedStats = [
-        { 
-          id: 1, 
-          label: "Active Consultations", 
-          value: statsData.activeConsultations || 0, 
-          icon: <Video size={20} />, 
-          color: "#4f46e5" 
+        {
+          id: 1,
+          label: "Active Consultations",
+          value: statsData.activeConsultations || 0,
+          icon: <Video size={20} />,
+          color: "#4f46e5"
         },
-        { 
-          id: 2, 
-          label: "Total Appointments Today", 
-          value: statsData.appointmentsToday || 0, 
-          icon: <Calendar size={20} />, 
-          color: "#16a34a" 
+        {
+          id: 2,
+          label: "Total Appointments Today",
+          value: statsData.appointmentsToday || 0,
+          icon: <Calendar size={20} />,
+          color: "#16a34a"
         },
-        { 
-          id: 3, 
-          label: "Avg. Wait Time", 
-          value: `${statsData.avgWaitTime || 8} min`, 
-          icon: <Clock size={20} />, 
-          color: "#f59e0b" 
+        {
+          id: 3,
+          label: "Avg. Wait Time",
+          value: `${statsData.avgWaitTime || 8} min`,
+          icon: <Clock size={20} />,
+          color: "#f59e0b"
         },
-        { 
-          id: 4, 
-          label: "Platform Satisfaction", 
-          value: `${statsData.platformSatisfaction || 94}%`, 
-          icon: <TrendingUp size={20} />, 
-          color: "#10b981" 
+        {
+          id: 4,
+          label: "Platform Satisfaction",
+          value: `${statsData.platformSatisfaction || 94}%`,
+          icon: <TrendingUp size={20} />,
+          color: "#10b981"
         },
       ];
 
@@ -79,12 +79,12 @@ const SystemMonitoring = () => {
     <div className="sm-container">
       <div className="sm-header-section">
         <h2 className="sm-title">Live System Monitoring</h2>
-        <button 
+        <button
           onClick={fetchMonitoringData}
           className="sm-refresh-btn"
           disabled={loading}
         >
-           {loading ? 'Refreshing...' : 'Refresh'}
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
@@ -103,7 +103,7 @@ const SystemMonitoring = () => {
           <p>Loading monitoring data...</p>
         </div>
       )}
-      
+
       {/* 1. KEY METRICS CARDS */}
       <div className="sm-stats-grid">
         {stats.map((stat) => (
