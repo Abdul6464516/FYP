@@ -35,7 +35,7 @@ const signUpSchema = z
       .string()
       .min(8, "Password must be at least 8 characters")
       .regex(strongPasswordRegex, "Password must include uppercase, lowercase, and a number"),
-    role: z.enum(["patient", "doctor", "admin"]),
+    role: z.enum(["patient", "doctor"]),
 
     age: z.string().optional(),
     gender: z.string().optional(),
@@ -100,14 +100,6 @@ const signUpSchema = z
       }
     }
 
-    if (role === "admin") {
-      if (!data.phone || !phoneRegex.test(data.phone)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone number must be exactly 11 digits", path: ["phone"] });
-      }
-      if (!data.city || data.city.trim().length < 2) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "City is required", path: ["city"] });
-      }
-    }
   });
 
 const SignUp = () => {
@@ -188,31 +180,23 @@ const SignUp = () => {
         });
       }
 
-      if (values.role === "admin") {
-        Object.assign(payload, {
-          phone: values.phone,
-          city: values.city,
-        });
-      }
-
       const data = await registerUser(payload);
 
       // Check verification status
-      if (data.user.role !== "admin" && data.user.verificationStatus === "pending") {
+      if (data.user.verificationStatus === "pending") {
         setVerificationMessage(`Your ${data.user.role} account has been created successfully! Please wait for the administrator to verify your account before you can access the system.`);
         setShowVerificationModal(true);
         setLoading(false);
         return;
       }
 
-      // If verified or admin, proceed with login
+      // If verified, proceed with login
       loginUserContext(data.token, data.user);
       toast.success(`${values.username} has created account`);
 
       setTimeout(() => {
         if (data.user.role === "patient") navigate("/patient");
         else if (data.user.role === "doctor") navigate("/doctor");
-        else if (data.user.role === "admin") navigate("/admin");
         else navigate("/login");
       }, 1000);
     } catch (err) {
@@ -247,9 +231,6 @@ const SignUp = () => {
     strongPasswordRegex.test(formData.password || "");
 
   const canSubmitRoleFields =
-    (formData.role === "admin" &&
-      phoneRegex.test(formData.phone || "") &&
-      !!formData.city?.trim()) ||
     (formData.role === "patient" &&
       Number(formData.age) >= 1 &&
       Number(formData.age) <= 120 &&
@@ -270,7 +251,6 @@ const SignUp = () => {
   const roles = [
     { value: "patient", label: "Patient", icon: <User size={22} />, desc: "Book appointments & manage health" },
     { value: "doctor", label: "Doctor", icon: <Stethoscope size={22} />, desc: "Manage patients & prescriptions" },
-    { value: "admin", label: "Admin", icon: <Settings size={22} />, desc: "System administration" },
   ];
 
   const perks = [
@@ -378,7 +358,7 @@ const SignUp = () => {
       <div style={s.right} className="auth-right">
         <div style={s.formWrapper} className="form-wrapper">
           <div style={s.formHeader}>
-            <h2 style={s.formTitle} className="form-title">{step === 1 ? "Create Account" : `${formData.role === "doctor" ? "Doctor" : formData.role === "admin" ? "Admin" : "Patient"} Details`}</h2>
+            <h2 style={s.formTitle} className="form-title">{step === 1 ? "Create Account" : `${formData.role === "doctor" ? "Doctor" : "Patient"} Details`}</h2>
             <p style={s.formSub}>
               {step === 1
                 ? "Fill in your basic information to get started"
@@ -540,16 +520,6 @@ const SignUp = () => {
                     <div style={s.twoCol} className="two-col">
                       {renderField("availability", "Availability", <Clock size={18} color={focusedField === "availability" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Mon-Fri 9-2")}
                       {renderField("city", "City", <MapPin size={18} color={focusedField === "city" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Karachi")}
-                    </div>
-                  </>
-                )}
-
-                {/* Admin fields */}
-                {formData.role === "admin" && (
-                  <>
-                    <div style={s.twoCol} className="two-col">
-                      {renderField("phone", "Contact Number", <Phone size={18} color={focusedField === "phone" ? "#16a34a" : "#9ca3af"} />, "tel", "+92 300 1234567")}
-                      {renderField("city", "City", <MapPin size={18} color={focusedField === "city" ? "#16a34a" : "#9ca3af"} />, "text", "e.g. Lahore")}
                     </div>
                   </>
                 )}
@@ -742,7 +712,7 @@ const s = {
 
   /* Role cards */
   roleRow: {
-    display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px",
+    display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px",
     width: "100%", marginBottom: "22px",
   },
   roleCard: {
@@ -786,12 +756,6 @@ const s = {
     color: "#6b7280", fontSize: "13px", fontWeight: "500",
     cursor: "pointer", marginBottom: "18px",
   },
-  adminNotice: {
-    textAlign: "center", padding: "32px 20px",
-    backgroundColor: "#f0fdf4", borderRadius: "14px",
-    border: "1px solid #bbf7d0", marginBottom: "20px",
-  },
-
   /* Buttons */
   nextBtn: {
     width: "100%", display: "flex", alignItems: "center",
